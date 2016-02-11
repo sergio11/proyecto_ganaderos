@@ -1,0 +1,11 @@
+ffmpeg -s 640x480 -i rtsp://212.128.154.211:554/live/ch0 -b:a 800k -r 30 http://localhost/camaras/stream/640/480
+
+ffmpeg -i rtsp://212.128.154.211:554/live/ch0  -s 640x480 -f image2 -b:a 800k -r 30 C:\xampp\htdocs\camaras\stream\640x480\%04d.jpg
+
+ffmpeg -i rtsp://212.128.154.211:554/live/ch0 -s 640x480 -f mp4video -vf "crop=iw-mod(iw\,2):ih-mod(ih\,2)" -b:a 800k -r 30 C:\xampp\htdocs\camaras\stream\640\480\out.mp4
+
+--FFMPEG command to convert rtsp to mp4
+ffmpeg -i rtsp://212.128.154.211:554/live/ch0 -s 640x480 -vcodec copy -acodec copy -r 30 C:\xampp\htdocs\camaras\stream\640\480\out.mp4
+
+--FFMPEG command to convert  rtsp to ogg
+ffmpeg -i rtsp://212.128.154.211:554/live/ch2 -s 640x480 -acodec libvorbis -vcodec libtheora -ac 2 -ab 96k -ar 44100 -b 819200 -movflags +faststart C:\xampp\htdocs\camaras\stream\640x480\out_2.ogg 

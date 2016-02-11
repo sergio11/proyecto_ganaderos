@@ -1,0 +1,22 @@
+{
+  "name": "camaras",
+  "authors": [
+    "Sergio <sss4esob@gmail.com>"
+  ],
+  "description": "Monitorización Animales",
+  "main": "index.html",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "google-maps-polygon-rotate": "~1.1.0",
+    "jquery": "~2.2.0"
+  }
+}
