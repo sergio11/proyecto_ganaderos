@@ -1,33 +1,52 @@
-var Map = (function(w){
+var Map = (function(_super,w){
 
-	var zoom = 10;
-	var icon = "img/cow-export.png";
+	__extends(Map, _super);
+
+	var zoom = 19;
+	var default_center = {'lat':40.796331,'lng':-6.242278};
+	var cow_icon = "img/cow-export.png";
+	var camera_icon = "img/camera.png";
 	
-	function Map(options){
+	function Map(cameras,cows){
 
-		this.map = new google.maps.Map(document.getElementById('map'), {
-		    center: this.camera,
+		this._cameras = cameras;
+		this._cows = cows;
+
+		this._map = new google.maps.Map(document.getElementById('map'), {
+		    center: new google.maps.LatLng(default_center.lat, default_center.lng),
 		    zoom: zoom,
-		    mapTypeId: google.maps.MapTypeId.TERRAIN,
+		    mapTypeId: google.maps.MapTypeId.SATELLITE,
 		    draggable: true,
 		    scrollwheel: false,
 		    disableDefaultUI: true
 		});
 
-		this.targets = options.targets;
-		this.current = options.current;
-		this.camera = options.camera;
-		this.infowindow = new google.maps.InfoWindow();
-		this.polygon = new google.maps.Polygon({
+		this._infowindow = new google.maps.InfoWindow();
+		this._polygon = new google.maps.Polygon({
 			strokeColor: '#DAA520',
 			strokeOpacity: 0.8,
 			strokeWeight: 2,
 			fillColor: '#DAA520',
 			fillOpacity: 0.35
 		});
-		this.currentMarker;
 		
 	}
+
+	Map.prototype._createMarkerFor = function(elem,icon) {
+		var marker = new google.maps.Marker({
+			position: elem.latlng,
+			animation: google.maps.Animation.DROP,
+			title: elem.title,
+			icon:icon
+		});
+
+		setTimeout(function() {
+			marker.setMap(this._map);
+		}.bind(this), (Math.random() * 30) + 1 );
+
+		return marker;
+	};
+
 	//Ajusta el mapa para dos puntos
 	Map.prototype._fitMap = function(cords) {
 		var bounds = new google.maps.LatLngBounds(this.camera, cords);
@@ -82,19 +101,27 @@ var Map = (function(w){
 	};
 
 	Map.prototype.load = function() {
-		var map = this.map;
-		for (var i =0, len = this.targets.length; i < len; i++)
-			(function(target){
-				var marker = new google.maps.Marker({
-				    position: target.latlng,
-				    animation: google.maps.Animation.DROP,
-				    title: target.title,
-				    icon:icon
-				});
+		//Cargamos las cámaras
+		for (var i =0, len = this._cameras.length; i < len; i++)
+			(function(camera){
+				camera.latlng = new google.maps.LatLng(camera.coords.lat,camera.coords.lng);
+				var marker = this._createMarkerFor(camera,camera_icon);
+			    marker.idx = i;
+			    /*marker.addListener('click',this._onChangeMarker.bind(this,marker));
+			    //Comprobamos si el target inicial coincide con el marker actual.
+				if(this.current && marker.getPosition().equals(this.current)){
+					this._onChangeMarker(marker);
+				}*/
+				
+				camera.marker = marker;
+			    
+			}.bind(this))(this._cameras[i]);
 
-				setTimeout(function() {
-			      marker.setMap(map);
-			    }, i * 200);
+		//Cargamos los objetivos
+		for (var i =0, len = this._cows.length; i < len; i++)
+			(function(cow){
+				cow.latlng = new google.maps.LatLng(cow.coords.lat,cow.coords.lng);
+				var marker = this._createMarkerFor(cow,cow_icon);
 			    marker.idx = i;
 			    marker.addListener('click',this._onChangeMarker.bind(this,marker));
 			    //Comprobamos si el target inicial coincide con el marker actual.
@@ -102,15 +129,14 @@ var Map = (function(w){
 					this._onChangeMarker(marker);
 				}
 
-				target.marker = marker;
+				cow.marker = marker;
 			    
-			}.bind(this))(this.targets[i]);
+			}.bind(this))(this._cows[i]);
+
 	};
 
-
-
-	Map.prototype.setCamera = function(cords){
-		cords && this.map.setCenter(cords);
+	Map.prototype.setCamera = function(i){
+		this._cameras[i] && this._map.setCenter(this._cameras[i].latlng);
 	}
 	//Rota el Polígono
 	Map.prototype.rotatePolygon = function(angle) {
@@ -133,4 +159,4 @@ var Map = (function(w){
 
 	return Map;
 
-})(window);
+})(EventEmitter,window);

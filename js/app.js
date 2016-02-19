@@ -1,99 +1,223 @@
-(function(w,$){
+var __extends = this.__extends || function (d, b) {
+	for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	function __() { this.constructor = d; }
+	__.prototype = b.prototype;
+	d.prototype = new __();
+};
 
-	$(function(){
+var EventEmitter = (function(){
 
-		var $container = $("#container");
-		var camera = new Camera();
-		camera.showIn($container);
-		camera.play();
+	function EventEmitter(){}
 
-		$("#controls").on("mousedown","[data-control]",function(e){
-			var cmd = this.dataset.control.toLowerCase();
-			switch(cmd){
-				case 'left':
-					camera.toLeft();
-				break;
-				case 'right':
-					camera.toRight();
-				break;
-				case 'up':
-					camera.toTop();
-				break;
-				case 'down':
-					camera.toBottom();
-				break;
-			}
-			
-		});
-
-		$("#controls").on("mouseup","[data-control]",function(e){
-			camera.stop();
-			
-		});
-		
-		
-
-	});
-
-
-	//API de google maps cargada
-	w.initMap = function(){
-
-		var angle = 15;
-		var target = document.getElementById('map');
-
-		var data = {
-			targets:[
-				{
-					latlng: new google.maps.LatLng(40.9259649395143, -5.3839874267578125),
-					title: "Marker 1",
-					content: "Contenido del Marker 1"
-				},
-				{
-					latlng: new google.maps.LatLng(40.91351257612757,-5.6105804443359375),
-					title: "Marker 2",
-					content: "Contenido del Marker 2"
-				},
-				{
-					latlng: new google.maps.LatLng(40.93841495689795,-5.7740020751953125),
-					title: "Marker 3",
-					content: "Contenido del Marker 3"
-				},
-				{
-					latlng: new google.maps.LatLng(40.97575093157535,-5.6270599365234375),
-					title: "Marker 4",
-					content: "Contenido del Marker 4"
-				}
-			],
-			current: new google.maps.LatLng(40.91351257612757,-5.6105804443359375),
-			camera:new google.maps.LatLng(40.9669835,-5.695766700000001)
-		}
-
-		var map = new Map(data);
-
-		map.load();
-
-		var controls = document.querySelectorAll("[data-control]");
-		controls.forEach(function(control){
-			control.addEventListener("click",function(e){
-				e.preventDefault();
-				var control = this.dataset.control;
-				map.rotatePolygon(control == "left" ? -angle : angle);
-			});
-		});
-		
-		document.getElementById("zoom").addEventListener("click",function(){
-			console.log("Zoom Nuevo");
-			console.log(this.value);
-			map.setZoom(this.value);
-		});
-
-		console.log("Zoom Actual del Mapa");
-		console.log(map.getZoom());
-
+	EventEmitter.prototype.addEventListener = function(events,callback,one){
+	    if((events && isNaN(parseInt(events))) && typeof(callback) == "function"){
+	        var events = events.trim().replace(/\s+/g,' ').split(" ");
+	        //Si one es true, marcamos el callback como de una sola ejecución.
+	        if (one) callback.one = true;
+	        for(var i = 0,len = events.length; i < len; i++)
+	            this.events[events[i]] && this.events[events[i]].push(callback);
+	    }
+	}
+        
+	EventEmitter.prototype.triggerEvent = function(event,data){
+	    if(this.events[event])
+	        for(var i = 0,len = this.events[event].length; i < len; i++ ){
+	            var callback = this.events[event][i];
+	            callback.one && this.events[event].splice(i,1);
+	            callback.apply(this,[data]);
+	        }    
 	}
 
+	return EventEmitter;
+})();
 
+
+(function(w,$){
+
+
+	//Cameras.
+	var cameras = [
+		{
+			'title': 'Cámara 1',
+			'coords':{
+				'lat': 40.795728,
+				'lng': -6.242950
+			},
+			'area': [
+				{
+					'lat': 40.795728,
+					'lng': -6.242950
+				},
+				{
+					'lat': 40.795548,
+					'lng': -6.242792
+				},
+				{
+					'lat': 40.795781,
+					'lng': -6.242253
+				},
+				{
+					'lat': 40.795970,
+					'lng': -6.242492
+				},
+				{
+					'lat': 40.795728,
+					'lng': -6.242950
+				}
+			]
+		},
+		{
+			'title': 'Cámara 2',
+			'coords':{
+				'lat': 40.796053,
+				'lng': -6.242559
+			},
+			'area': [
+				{
+					'lat': 40.796053,
+					'lng': -6.242559
+				},
+				{
+					'lat': 40.796566,
+					'lng': -6.242636
+				},
+				{
+					'lat': 40.797076,
+					'lng': -6.241637
+				},
+				{
+					'lat': 40.796768,
+					'lng': -6.241316
+				},
+				{
+					'lat': 40.796442,
+					'lng': -6.241644
+				},
+				{
+					'lat': 40.796158,
+					'lng': -6.241365
+				},
+				{
+					'lat': 40.795878,
+					'lng': -6.241990
+				},
+				{
+					'lat': 40.796053,
+					'lng': -6.242559
+				}
+			]
+		},
+		{
+			'title': 'Cámara 3',
+			'coords':{
+				'lat': 40.796114,
+				'lng': -6.242665
+			},
+			'area': [
+				{
+					'lat': 40.796114,
+					'lng': -6.242665
+				},
+				{
+					'lat': 40.796575,
+					'lng': -6.242641
+				},
+				{
+					'lat': 40.796837,
+					'lng': -6.242902
+				},
+				{
+					'lat': 40.796393,
+					'lng': -6.243674
+				},
+				{
+					'lat': 40.795912,
+					'lng': -6.243233
+				},
+				{
+					'lat': 40.796114,
+					'lng': -6.242665
+				}
+			]
+		}
+	];
+
+	var cows = [
+		{ 
+			'coords':{
+				'lat': 40.796581,
+				'lng': -6.242048
+			},
+			title: "Marker 1",
+			content: "Contenido del Marker 1"
+		},
+		{
+			'coords':{
+				'lat': 40.796406,
+				'lng': -6.241906
+			},
+			title: "Marker 2",
+			content: "Contenido del Marker 2"
+		},
+		{
+			'coords':{
+				'lat': 40.796574,
+				'lng': -6.242434
+			},
+			title: "Marker 3",
+			content: "Contenido del Marker 3"
+		},
+		{
+			'coords':{
+				'lat': 40.796030,
+				'lng': -6.242104
+			},
+			title: "Marker 4",
+			content: "Contenido del Marker 4"
+		},
+		{
+			'coords':{
+				'lat': 40.795747,
+				'lng': -6.242578
+			},
+			title: "Marker 5",
+			content: "Contenido del Marker 5"
+		},
+		{
+			'coords':{
+				'lat': 40.796352,
+				'lng': -6.243132
+			},
+			title: "Marker 6",
+			content: "Contenido del Marker 6"
+		}
+	];
+
+	var angle = 15;
+	//Google MAPS API loaded
+	w.initMap = function(){
+		var map = new Map(cameras,cows);
+		map.load();
+
+		var controlPanel = new ControlPanel(cameras);
+		//Implementamos manejadores.
+		controlPanel.addEventListener('rotate-camera',function(e){
+			map.rotatePolygon(e.to == "left" ? -angle : angle);
+		});
+		controlPanel.addEventListener('camera-zoom',function(e){
+			map.setZoom(e.value);
+		});
+		controlPanel.addEventListener('change-camera',function(i){
+			console.log("índice de la cámara actual : " + i);
+			map.setCamera(i);
+		});
+
+		//Inicio panel de control.
+		controlPanel.init();
+		
+
+
+	}
 
 
 })(window,jQuery);

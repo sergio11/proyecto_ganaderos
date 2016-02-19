@@ -2,9 +2,19 @@ var Camera = (function(w,$){
 
 	//Camera Constructor
 	function Camera(options){
+		this._title = options.title;
+		this._latlng = options.latlng;
+		this._area = options.area;
 		this._timer = null;
 		this._content = null;
-	} 
+	}
+
+	//Send PTZ Command to Proxy
+	Camera.prototype._ptzCmdSubmit = function(command) {
+		$.get("./ptzCtrlProxy.php",{
+			'act': command
+		});			
+	};
 
 
 	//
@@ -17,12 +27,7 @@ var Camera = (function(w,$){
 		});
 	};
 
-	//Send PTZ Command to Proxy
-	Camera.prototype._ptzCmdSubmit = function(command) {
-		$.get("./ptzCtrlProxy.php",{
-			'act': command
-		});			
-	};
+	
 
 	//PTZ Controls
 	Camera.prototype.toLeft = function() {
@@ -45,7 +50,7 @@ var Camera = (function(w,$){
 		this._ptzCmdSubmit('stop');
 	};
 
-	Camera.prototype.showIn = function($container) {
+	Camera.prototype.showIn = function($target) {
 		if(!this._content){
 			if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1){
 				this._content = $("<img>",{'width':640,'height':480});
@@ -60,7 +65,7 @@ var Camera = (function(w,$){
 				}
 			}
 		}
-		this._content.appendTo($container);
+		this._content.appendTo($target);
 	};
 
 	Camera.prototype.play = function() {
