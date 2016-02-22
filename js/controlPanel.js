@@ -14,45 +14,40 @@ var ControlPanel = (function(_super,w,$){
 	}
 
 	ControlPanel.prototype.init = function() {
-
-		//Instanciamos cámaras.
-		this._cameras = this._cameras.map(function(data){
-			return new Camera(data);
-		});
-
 		//Activamos por defecto la primera cámara
-		this._cameras[this._current].showIn(this._$container);
-		//Notificamos cambio de cámara
-		this.triggerEvent('change-camera',this._current);
-
+		this._current = this._cameras[this._current];
+		this._current.showIn(this._$container);
+		//Funcionalidad para los controles.
+		var self = this;
 		$("#controls").on("mousedown","[data-control]",function(e){
 			var cmd = this.dataset.control.toLowerCase();
 			switch(cmd){
 				case 'left':
-					camera.toLeft();
-				break;
 				case 'right':
-					camera.toRight();
+					if (cmd == 'left') {
+						self._current.toLeft();
+					}else{
+						self._current.toRight();
+					}
+					//notificamos operación
+					self.triggerEvent('rotate-camera',cmd);
+					
+					
 				break;
 				case 'up':
-					camera.toTop();
+					self._current.toTop();
 				break;
 				case 'down':
-					camera.toBottom();
+					self._current.toBottom();
 				break;
 			}
 			
+		}).on("mouseup","[data-control]",function(e){
+			self._current.stop();
 		});
 
-		$("#controls").on("mouseup","[data-control]",function(e){
-			camera.stop();
-		});
-
-		
-	
 	};
 
-	
 
 	return ControlPanel;
 

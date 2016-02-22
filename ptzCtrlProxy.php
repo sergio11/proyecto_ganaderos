@@ -10,7 +10,7 @@
 		$act = strtolower(trim(strip_tags($_GET['act'])));
 		$username='admin';
 		$password='123456';
-		$URL="http://212.128.154.211/hy-cgi/ptz.cgi?cmd=ptzctrl&act=$act";
+		$URL="http://212.128.156.124/hy-cgi/ptz.cgi?cmd=ptzctrl&act=$act";
 		$handler = fopen('./proxy-error.log','w');
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $URL);
