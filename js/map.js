@@ -67,10 +67,7 @@ var Map = (function(_super,w){
 	//Manejador evento click sobre marker tipo cámara.
 	Map.prototype._onClickCamera = function(camera) {
 		this.setCamera(camera);
-		this._cameras.forEach(function(camera){
-			camera.stopAnimateMarker();
-		});
-		camera.animateMarker();
+		
 	};
 
 	Map.prototype._onClickCow = function(cow) {
@@ -134,6 +131,10 @@ var Map = (function(_super,w){
 		this._currentCamera && this._currentCamera.hideArea();
 		//guardamos referencia a la nueva cámara activa
 		this._currentCamera = camera;
+		this._cameras.forEach(function(camera){
+			camera.stopAnimateMarker();
+		});
+		this._currentCamera.animateMarker();
 		this._map.setCenter(camera.getLatlng());
 		camera.showAreaIn(this._map);
 		
