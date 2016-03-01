@@ -30,6 +30,7 @@ var Map = (function(_super,w){
 			fillColor: '#DAA520',
 			fillOpacity: 0.35
 		});
+		this.angle = 0;
 		
 	}
 
@@ -88,10 +89,6 @@ var Map = (function(_super,w){
 				return target.marker;
 			}
 		}.bind(this));
-		console.log("Target Obtenido");
-		console.log(marker);
-		console.log("Todos los targets");
-		console.log(this.targets);
 		marker && this._onChangeMarker(marker);
 	};
 
@@ -108,6 +105,7 @@ var Map = (function(_super,w){
  		var v2=new google.maps.geometry.spherical.computeOffsetOrigin(camera, distancia, angle-angle_offset);
 	    //Establece path del polígono para que apunte al destino
 	    this._polygon.setPath([camera,v1,v2,camera]);
+	    this.angle = angle;
 		this._polygon.setMap(this._map);
 	};
 
@@ -137,8 +135,6 @@ var Map = (function(_super,w){
 		this._currentCamera.animateMarker();
 		this._map.setCenter(camera.getLatlng());
 		camera.showAreaIn(this._map);
-		
-			
 	}
 
 
@@ -188,16 +184,26 @@ var Map = (function(_super,w){
 	};
 
 
+	Map.prototype.rotatePolygonToLeft = function() {
+		this.angle -= 1;
+		this._polygon.rotate(-1, this._currentCamera.getLatlng());
+	};
+
+	Map.prototype.rotatePolygonToRight = function() {
+		this.angle += 1;
+		this._polygon.rotate(1, this._currentCamera.getLatlng());
+	};
+
 	//Rota el Polígono
-	Map.prototype.rotatePolygon = function(angle) {
-		if(angle){
+	/*Map.prototype.rotatePolygon = function(angle) {
+			//google.maps.geometry.poly.containsLocation(this._polygon.getCenter(),this._currentCamera.getArea())
 			// Bounds
 			//var strictBounds = new google.maps.LatLngBounds(this._currentCamera.getArea().getPath());
-			this._polygon.rotate(angle, this._currentCamera.getLatlng());
+			
 			//buscamos nuevo objetivo
 			//this._findNewTarget();
 		}
-	};
+	};*/
 	
 	
 

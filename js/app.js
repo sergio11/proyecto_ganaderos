@@ -187,7 +187,11 @@
 		});
 
 		controlPanel.addEventListener('rotate-camera',function(direction){
-			map.rotatePolygon(direction == "left" ? -angle : angle);
+			if (direction == "left" ) {
+				map.rotatePolygonToLeft();
+			}else{
+				map.rotatePolygonToRight();
+			}
 		});
 
 		//Inicio panel de control.
