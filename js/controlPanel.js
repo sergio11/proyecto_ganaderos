@@ -51,6 +51,12 @@ var ControlPanel = (function(_super,w,$){
 			clearInterval(timer);
 		});
 
+		$("#zoom").on("change",function(e){
+			self.triggerEvent('camera-zoom',parseInt(this.value));
+		});
+
+
+
 	};
 
 

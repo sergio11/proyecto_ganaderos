@@ -2,7 +2,7 @@ var Map = (function(_super,w){
 
 	__extends(Map, _super);
 
-	var zoom = 19;
+	var zoom = 18;
 	var default_center = {'lat':40.796331,'lng':-6.242278};
 	var cow_icon = "img/cow-export.png";
 	var camera_icon = "img/camera.png";
@@ -183,27 +183,23 @@ var Map = (function(_super,w){
 
 	};
 
-
-	Map.prototype.rotatePolygonToLeft = function() {
-		this.angle -= 1;
-		this._polygon.rotate(-1, this._currentCamera.getLatlng());
-	};
-
-	Map.prototype.rotatePolygonToRight = function() {
-		this.angle += 1;
-		this._polygon.rotate(1, this._currentCamera.getLatlng());
-	};
-
 	//Rota el Polígono
-	/*Map.prototype.rotatePolygon = function(angle) {
-			//google.maps.geometry.poly.containsLocation(this._polygon.getCenter(),this._currentCamera.getArea())
-			// Bounds
-			//var strictBounds = new google.maps.LatLngBounds(this._currentCamera.getArea().getPath());
-			
+	Map.prototype.rotatePolygon = function(direction) {
+
+		if (!google.maps.geometry.poly.isLocationOnEdge(this._polygon.getCenter(),this._currentCamera.getArea(),0.00001)) {
+			if (direction == "left" ) {
+				this.angle -= 1;
+				this._polygon.rotate(-1, this._currentCamera.getLatlng());
+			}else{
+				this.angle += 1;
+				this._polygon.rotate(1, this._currentCamera.getLatlng());
+			}
+
+		}
 			//buscamos nuevo objetivo
 			//this._findNewTarget();
-		}
-	};*/
+
+	};
 	
 	
 

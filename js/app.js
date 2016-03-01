@@ -178,8 +178,10 @@
 
 		var controlPanel = new ControlPanel(cameras);
 		//Implementamos manejadores.
-		controlPanel.addEventListener('camera-zoom',function(e){
-			map.setZoom(e.value);
+		controlPanel.addEventListener('camera-zoom',function(zoom){
+			console.log("zoom");
+			console.log(zoom);
+			map.setZoom(zoom);
 		});
 		controlPanel.addEventListener('change-camera',function(i){
 			console.log("índice de la cámara actual : " + i);
@@ -187,11 +189,7 @@
 		});
 
 		controlPanel.addEventListener('rotate-camera',function(direction){
-			if (direction == "left" ) {
-				map.rotatePolygonToLeft();
-			}else{
-				map.rotatePolygonToRight();
-			}
+			map.rotatePolygon(direction);
 		});
 
 		//Inicio panel de control.
