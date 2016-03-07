@@ -49,9 +49,7 @@ var Camera = (function(w,$){
 
 	//Send PTZ Command to Proxy
 	Camera.prototype._ptzCmdSubmit = function(command) {
-		$.get("./ptzCtrlProxy.php",{
-			'act': command
-		});			
+		$.get("./ptzCtrlProxy.php",{'act': command});			
 	};
 
 	Camera.prototype._showNextImage = function() {
@@ -81,7 +79,23 @@ var Camera = (function(w,$){
 		this._ptzCmdSubmit('down');
 	};
 
+	Camera.prototype.toHome = function() {
+		this._ptzCmdSubmit('home');
+	};
+
 	Camera.prototype.stop = function() {
+		this._ptzCmdSubmit('stop');
+	};
+
+	Camera.prototype.verticalScan = function() {
+		this._ptzCmdSubmit('vscan');
+	};
+
+	Camera.prototype.horizontalScan = function() {
+		this._ptzCmdSubmit('hscan');
+	};
+
+	Camera.prototype.stopScan = function() {
 		this._ptzCmdSubmit('stop');
 	};
 

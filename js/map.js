@@ -31,6 +31,7 @@ var Map = (function(_super,w){
 			fillOpacity: 0.35
 		});
 		this.angle = 0;
+		this.limit_exceeded;
 		
 	}
 
@@ -52,6 +53,8 @@ var Map = (function(_super,w){
 
 	//Ajusta el mapa para dos puntos
 	Map.prototype._fitMap = function(cords) {
+		console.log("Cords ...");
+		console.log(cords);
 		var bounds = new google.maps.LatLngBounds(this._currentCamera.getLatlng(), cords);
   		this._map.fitBounds(bounds);
 	};
@@ -79,17 +82,6 @@ var Map = (function(_super,w){
 		}
 		this._setCurrentTarget(cow.marker.getPosition());
 		this._attachInfoWindows(cow.marker,this._cows[cow.marker.idx].content);
-	};
-
-
-
-	Map.prototype._findNewTarget = function() {
-		var marker = this.targets.find(function(target){
-			if(google.maps.geometry.poly.containsLocation(target.latlng, this.polygon)){
-				return target.marker;
-			}
-		}.bind(this));
-		marker && this._onChangeMarker(marker);
 	};
 
 	//Cambia Objetivo de la cámara
@@ -136,7 +128,6 @@ var Map = (function(_super,w){
 		this._map.setCenter(camera.getLatlng());
 		camera.showAreaIn(this._map);
 	}
-
 
 	Map.prototype.load = function() {
 		//Cargamos las cámaras
@@ -186,18 +177,20 @@ var Map = (function(_super,w){
 	//Rota el Polígono
 	Map.prototype.rotatePolygon = function(direction) {
 
-		if (!google.maps.geometry.poly.isLocationOnEdge(this._polygon.getCenter(),this._currentCamera.getArea(),0.00001)) {
+		if(this.limit_exceeded != direction && google.maps.geometry.poly.containsLocation(this._polygon.getCenter(), this._currentCamera.getArea())){
+			this.limit_exceeded = null;
 			if (direction == "left" ) {
-				this.angle -= 1;
-				this._polygon.rotate(-1, this._currentCamera.getLatlng());
+				this.angle -= 0.1;
+				this._polygon.rotate(-0.1, this._currentCamera.getLatlng());
 			}else{
-				this.angle += 1;
-				this._polygon.rotate(1, this._currentCamera.getLatlng());
+				this.angle += 0.1;
+				this._polygon.rotate(0.1, this._currentCamera.getLatlng());
 			}
-
+		}else{
+			this.limit_exceeded = direction;
 		}
-			//buscamos nuevo objetivo
-			//this._findNewTarget();
+		
+
 
 	};
 	

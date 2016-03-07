@@ -26,41 +26,95 @@ html, body {
 	align-items:center;
 }
 
-
-.wrapper .control-panel .control-panel-content .controls{
-	padding: 1rem .5rem;
-}
-
-.wrapper .control-panel .control-panel-content .controls > *{
+.controls  > *{
 	display: inline-block;
 	vertical-align: middle;
 	margin:0 1rem;
 }
 
-.wrapper .control-panel .control-panel-content .controls > a[data-control]{
-	font-size: 3rem;
+.controls .direction-controls{
+	padding: 1rem .5rem;
+}
+
+.controls .direction-controls .main{
+	position: relative;
+	width: 120px;height: 120px;
+	margin-bottom:2rem;
+}
+
+.controls .direction-controls .others{
+	width: 150px;
+}
+
+.controls .direction-controls .others > a[data-control]:not(:first-child){
+	margin-left: 1rem;
+}
+
+.controls .direction-controls a[data-control]{
+	font-size: 2rem;
 	color: #DAA520;
+	outline: none;
+	text-decoration: none;
 	-webkit-transition:all .5s;
 	trasition:all .5s;
 }
 
-.wrapper .control-panel .control-panel-content .controls > a[data-control='right']:active{
-	-webkit-transform:translateX(6px);
-	transform:translateX(6px);
+.controls .direction-controls .main a[data-control]{
+	position: absolute;
 }
 
-.wrapper .control-panel .control-panel-content .controls > a[data-control='left']:active{
-	-webkit-transform:translateX(-6px);
-	transform:translateX(-6px);
+.controls .direction-controls .main a[data-control='right']{
+	top: 50%; right: 0;
+	-webkit-transform:translate(0,-50%);
+	transform:translate(0,-50%);
 }
 
-.wrapper .control-panel .control-panel-content .controls > a[data-control='up']:active{
-	-webkit-transform:translateY(-6px);
-	transform:translateY(-6px);
+.controls .direction-controls .main a[data-control='right']:active{
+	-webkit-transform:translate(6px,-50%);
+	transform:translate(6px,-50%);
 }
 
-.wrapper .control-panel .control-panel-content .controls > a[data-control='down']:active{
-	-webkit-transform:translateY(6px);
-	transform:translateY(6px);
+.controls .direction-controls .main a[data-control='left']{
+	top: 50%; left: 0;
+	-webkit-transform:translate(0,-50%);
+	transform:translate(0,-50%);
+}
+
+.controls .direction-controls .main a[data-control='left']:active{
+	-webkit-transform:translate(-6px,-50%);
+	transform:translate(-6px,-50%);
+}
+
+.controls .direction-controls .main a[data-control='up']{
+	top: 0; left: 50%;
+	-webkit-transform:translate(-50%,0);
+	transform:translate(-50%,0);
+}
+
+.controls .direction-controls .main a[data-control='up']:active{
+	-webkit-transform:translate(-50%,-6px);
+	transform:translate(-50%,-6px);
+}
+
+.controls .direction-controls .main a[data-control='down']{
+	bottom: 0; left: 50%;
+	-webkit-transform:translate(-50%,0);
+	transform:translate(-50%,0);
+}
+
+.controls .direction-controls .main a[data-control='down']:active{
+	-webkit-transform:translate(-50%,6px);
+	transform:translate(-50%,6px);
+}
+
+.controls .direction-controls .main a[data-control='home']{
+	top: 50%; left: 50%;
+	-webkit-transform:translate(-50%,-50%);
+	transform:translate(-50%,-50%);
+}
+
+.controls .direction-controls .main a[data-control='home']:active{
+	-webkit-transform:translate(-50%,-50%) scale(1.2);
+	transform:translate(-50%,-50%)  scale(1.2);
 }
       

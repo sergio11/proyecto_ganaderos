@@ -15,13 +15,41 @@
 				<div class="current">
 					<div id='container'></div>
 					
-					<div class="controls" id="controls">
-						<a href="#" data-control='up'><span class="fa fa-arrow-up"></span></a>
-						<a href="#" data-control='left'><span class="fa fa-arrow-left"></span></a>
-						<a href="#" data-control='right'><span class="fa fa-arrow-right"></span></a>
-						<a href="#" data-control='down'><span class="fa fa-arrow-down"></span></a>
+					<div class="controls">
+						<div class="direction-controls">
+							<div class="main" id="mainControls">
+								<a href="#" data-control='up'>
+									<span class="fa fa-arrow-up"></span>
+								</a>
+								<a href="#" data-control='left'>
+									<span class="fa fa-arrow-left"></span>
+								</a>
+								<a href="#" data-control='home'>
+									<span class="fa fa-home"></span>
+								</a>
+								<a href="#" data-control='right'>
+									<span class="fa fa-arrow-right"></span>
+								</a>
+								<a href="#" data-control='down'>
+									<span class="fa fa-arrow-down"></span>
+								</a>
+							</div>
+							<div class="others" id="otherControls">
+								<a href="#" data-control='vscan'>
+									<span class="fa fa-arrows-v"></span>
+								</a>
+								<a href="#" data-control='hscan'>
+									<span class="fa fa-arrows-h"></span>
+								</a>
+								<a href="#" data-control='hvstop'>
+									<span class="fa fa-stop-circle"></span>
+								</a>
+							</div>
+						</div>
+						
 						<input type="range" id='zoom' name="zoom" min="15" max="20" value="18">
 					</div>
+					
 				</div>
 			</div>
 			<div></div>

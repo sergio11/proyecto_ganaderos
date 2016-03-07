@@ -6,7 +6,7 @@
 	var cameras = [
 		{
 			'title': 'Cámara 1',
-			'url': 'rtsp://212.128.156.124:554/live/ch0',
+			'url': 'rtsp://212.128.154.128:554/live/ch0',
 			'coords':{
 				'lat': 40.795728,
 				'lng': -6.242950
@@ -36,7 +36,7 @@
 		},
 		{
 			'title': 'Cámara 2',
-			'url': 'rtsp://212.128.156.124:554/live/ch0',
+			'url': 'rtsp://212.128.154.128:554/live/ch0',
 			'coords':{
 				'lat': 40.796053,
 				'lng': -6.242559
@@ -78,7 +78,7 @@
 		},
 		{
 			'title': 'Cámara 3',
-			'url': 'rtsp://212.128.156.124:554/live/ch0',
+			'url': 'rtsp://212.128.154.128:554/live/ch0',
 			'coords':{
 				'lat': 40.796114,
 				'lng': -6.242665
@@ -154,7 +154,7 @@
 			content: "Contenido del Marker 5"
 		},
 		{
-			'coords':{
+			'coords': {
 				'lat': 40.796352,
 				'lng': -6.243132
 			},
