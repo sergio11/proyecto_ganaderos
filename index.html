@@ -17,6 +17,7 @@
 					
 					<div class="controls">
 						<div class="direction-controls">
+							<!-- Main Controls -->
 							<div class="main" id="mainControls">
 								<a href="#" data-control='up'>
 									<span class="fa fa-arrow-up"></span>
@@ -34,6 +35,7 @@
 									<span class="fa fa-arrow-down"></span>
 								</a>
 							</div>
+							<!-- Other direction Controls -->
 							<div class="others" id="otherControls">
 								<a href="#" data-control='vscan'>
 									<span class="fa fa-arrows-v"></span>
@@ -46,8 +48,29 @@
 								</a>
 							</div>
 						</div>
+						<div class="others-controls">
+							<div class="presets">
+								<form name="add_preset" class="add_preset" id="add_preset">
+									<input type="text" name='preset' class="preset_text" placeholder="Preset Name" />
+									<input type="submit" class="btn" value="Add" />
+								</form>
+								<a href="#" class="btn" id="showPresets">Go Preset&nbsp;<span class="fa fa-caret-down"></span></a>
+								<ul class="go_presets">
+									<li class="preset">
+										Preset One &nbsp; 
+										<a href="#" class="go"><span class="fa fa-external-link"></span></a>
+										<a href="#" class="delete"><span class="fa fa-trash"></span></a>
+									</li>
+									<li class="preset">
+										Preset One &nbsp; 
+										<a href="#" class="go"><span class="fa fa-external-link"></span></a>
+										<a href="#" class="delete"><span class="fa fa-trash"></span></a>
+									</li>
+								</ul>
+							</div>
+							<input type="range" id='zoom' name="zoom" min="15" max="20" value="18">
+						</div>
 						
-						<input type="range" id='zoom' name="zoom" min="15" max="20" value="18">
 					</div>
 					
 				</div>
@@ -57,12 +80,14 @@
 		<div id="map" class="map"></div>
 	</div>
 
-	<div id="content">
-		<div id="siteNotice">
-      		<h1 id="firstHeading" class="firstHeading">Uluru</h1>
-      		<div class="body">
-		      
-		    </div>
+	<!-- Popup -->
+	<div id="popup" class="popup hide">
+		<h3 class="popup-header" data-cow-name>Uluru</h3>
+		<div class="popup-body">
+			<figure>
+				<img src="./img/vaca.jpg" width="120">
+				<figcaption data-cow-desc></figcaption>
+			</figure>
 		</div>
 	</div>
 

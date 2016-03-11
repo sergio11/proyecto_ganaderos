@@ -53,8 +53,6 @@ var Map = (function(_super,w){
 
 	//Ajusta el mapa para dos puntos
 	Map.prototype._fitMap = function(cords) {
-		console.log("Cords ...");
-		console.log(cords);
 		var bounds = new google.maps.LatLngBounds(this._currentCamera.getLatlng(), cords);
   		this._map.fitBounds(bounds);
 	};
@@ -63,15 +61,15 @@ var Map = (function(_super,w){
 	Map.prototype._attachInfoWindows= function(marker,body) {
 		this._infowindow.close();
 		this._infowindow.open(this._map, marker);
-		var content = document.getElementById("content");
-		content.querySelector(".body").textContent = body;
-		this._infowindow.setContent(content);
+		var popup = document.getElementById("popup");
+		popup.classList.remove("hide");
+		popup.querySelector("[data-cow-desc]").textContent = body;
+		this._infowindow.setContent(popup);
 	};
 
 	//Manejador evento click sobre marker tipo cámara.
 	Map.prototype._onClickCamera = function(camera) {
 		this.setCamera(camera);
-		
 	};
 
 	Map.prototype._onClickCow = function(cow) {
@@ -144,7 +142,6 @@ var Map = (function(_super,w){
 				/*if(this.current && marker.getPosition().equals(this.current)){
 					this._onChangeMarker(marker);
 				}*/
-				
 				camera.setMarker(marker);
 			    
 			}.bind(this))(this._cameras[i]);

@@ -73,6 +73,12 @@ var ControlPanel = (function(_super,w,$){
 
 		});
 
+		$("#showPresets").on("click",function(e){
+			e.preventDefault();
+			console.log("Show presets ...");
+			$(this).toggleClass("active").next().toggleClass("collapsible");
+
+		});
 
 		$("#zoom").on("change",function(e){
 			self.triggerEvent('camera-zoom',parseInt(this.value));

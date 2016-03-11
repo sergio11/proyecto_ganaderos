@@ -105,9 +105,21 @@ var Camera = (function(w,$){
 				this._content = $("<img>",{'width':640,'height':480});
 			}else{
 				if(w.confirm("¿Usar Componente VLC para visualizar Vídeo?")){
-					this._content = $("<object>").append(
+					this._content = $("<object>",{'id':'player'}).append(
 						$("<param>",{'name':'movie','value': this._url}),
-						$("<embed>",{'type':'application/x-vlc-plugin','name':'video1','autoplay':'no','loop':'no','width':640,'height':480,'target':this._url})
+						$("<param>",{'name':'autostart','value':true}),
+						$("<param>",{'name':'text','value': 'Vamos!!!'}),
+						$("<embed>",{
+							'id':'vlc',
+							'type':'application/x-vlc-plugin',
+							'pluginspage':'http://www.videolan.org',
+							'name':'video1',
+							'autoplay':'no',
+							'loop':'no',
+							'width':640,
+							'height':480,
+							'target':this._url
+						})
 					)
 				}else{
 					this._content = $("<img>",{'width':640,'height':480});

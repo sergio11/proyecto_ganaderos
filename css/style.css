@@ -4,6 +4,10 @@ html, body {
    	padding: 0;
 }
 
+.hide{
+	display: none;
+}
+
 .wrapper{
 	width: 90%;
 	height: 85%;
@@ -32,6 +36,7 @@ html, body {
 	margin:0 1rem;
 }
 
+/*Directions Controls*/
 .controls .direction-controls{
 	padding: 1rem .5rem;
 }
@@ -116,5 +121,131 @@ html, body {
 .controls .direction-controls .main a[data-control='home']:active{
 	-webkit-transform:translate(-50%,-50%) scale(1.2);
 	transform:translate(-50%,-50%)  scale(1.2);
+}
+
+/* Presets */
+
+.controls .presets{
+	margin-bottom: 2rem;
+	position: relative;
+}
+
+.controls .presets > * {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.controls .presets .preset_text,
+.controls .presets .btn{
+	padding: 0.4rem 1rem;
+	
+}
+
+.controls .presets .preset_text::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #000;
+  font-style: italic;
+}
+.controls .presets .preset_text::-moz-placeholder { /* Firefox 19+ */
+  color: #000;
+  font-style: italic;
+}
+.controls .presets .preset_text:-ms-input-placeholder { /* IE 10+ */
+  color: #000;
+  font-style: italic;
+}
+.controls .presets .preset_text:-moz-placeholder { /* Firefox 18- */
+  color: #000;
+  font-style: italic;
+}
+
+.controls .presets .btn{
+	border:none;
+	font-weight: bold;
+	text-decoration: none;
+	text-align: center;
+	background-color: #DAA520;
+	color: #fff;
+	border-radius: 2px;
+	-webkit-trasition:all .5s;
+	transition: all .5s;
+	cursor: pointer;
+}
+
+
+.controls .presets .btn .fa{
+	vertical-align: middle;
+	margin-left: .5rem;
+}
+
+.controls .presets .btn:hover,
+.controls .presets .btn.active {
+	background-color: #C5951C;
+}
+
+.controls .presets .go_presets{
+	position: absolute;
+	top: 100%; right: 0;
+	width: 50%;
+	height: 200px;
+	opacity: 0;
+	background-color: #fff;
+	border-radius: 3px;
+	list-style: none;
+	list-style-position: outside;
+	-webkit-transition: opacity .5s;
+	transition: opacity .5s;
+	margin: 1rem 0;
+}
+
+.controls .presets .go_presets .preset:not(:last-child){
+	margin-bottom: 1rem;
+}
+
+.controls .presets .go_presets .preset a{
+	padding: .3rem .4rem;
+	border-radius: 2px;
+	-webkit-trasition: all .5s;
+	transition: all .5s;
+}
+
+.controls .presets .go_presets .preset .fa{
+	color: #fff;
+}
+
+.controls .presets .go_presets .preset .go{
+	background-color: #C5951C;
+}
+
+.controls .presets .go_presets .preset .go:hover{
+	background-color: #AA8528;
+}
+
+.controls .presets .go_presets .preset .delete{
+	background-color: #DA202D;
+}
+
+.controls .presets .go_presets .preset .delete:hover{
+	background-color: #A7242E;
+}
+
+.controls .presets .go_presets.collapsible{
+	opacity: 1;
+}
+
+
+/*
+	Popup
+	=====
+*/
+
+.popup{
+	font-size: 1.2rem;
+	text-align: center;
+}
+.popup .popup-header{
+	color: #DAA520;
+}
+.popup .popup-body figure{
+	margin: 0;
 }
       
