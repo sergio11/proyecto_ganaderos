@@ -108,7 +108,6 @@ var Camera = (function(w,$){
 					this._content = $("<object>",{'id':'player'}).append(
 						$("<param>",{'name':'movie','value': this._url}),
 						$("<param>",{'name':'autostart','value':true}),
-						$("<param>",{'name':'text','value': 'Vamos!!!'}),
 						$("<embed>",{
 							'id':'vlc',
 							'type':'application/x-vlc-plugin',

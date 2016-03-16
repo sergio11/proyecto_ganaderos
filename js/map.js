@@ -53,7 +53,9 @@ var Map = (function(_super,w){
 
 	//Ajusta el mapa para dos puntos
 	Map.prototype._fitMap = function(cords) {
-		var bounds = new google.maps.LatLngBounds(this._currentCamera.getLatlng(), cords);
+		var bounds = new google.maps.LatLngBounds();
+        //this._currentCamera.getLatlng()
+        bounds.extend(cords);
   		this._map.fitBounds(bounds);
 	};
 
