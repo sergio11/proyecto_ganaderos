@@ -1,160 +1,251 @@
-var Camera = (function(w,$){
+var Camera = (function (_super, w, $) {
 
-	//Camera Constructor
-	function Camera(options){
-		this._title = options.title;
-		this._url = options.url;
-		this._latlngPlain = options.coords;
-		this._latlng = new google.maps.LatLng(options.coords.lat,options.coords.lng);
-		this._area = new google.maps.Polygon({
-			paths: options.area,
-			strokeColor: '#FF0000',
-			strokeOpacity: 0.8,
-			strokeWeight: 2,
-			fillColor: '#FF0000',
-			fillOpacity: 0.15,
-			draggable: false,
-			geodesic: true
-		});
-		this._timer = null;
-		this._content = null;
-		this._areaPolygon = null;
-		this._marker = null;
-	}
+    __extends(Camera, _super);
 
-	//Getters and Setters
-	Camera.prototype.getTitle = function() {
-		return this._title;
-	};
+    //Camera Constructor
+    function Camera(options) {
+        this._title = options.title;
+        this._url = options.url;
+        this._latlngPlain = options.coords;
+        this._latlng = new google.maps.LatLng(options.coords.lat, options.coords.lng);
+        this._area = new google.maps.Polygon({
+            paths: options.area,
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.15,
+            draggable: false,
+            geodesic: true
+        });
+        this._zones = options.zones.map(function (zone) {
+            var polygon = new google.maps.Polygon({
+                strokeColor: '#0D6F90',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#22B8EB',
+                fillOpacity: 0.35
+            });
+            polygon.setPath(zone.map(function (poit) {
+                return new google.maps.LatLng(poit.lat, poit.lng);
+            }));
 
-	Camera.prototype.getLatlng = function() {
-		return this._latlng;
-	};
-
-	Camera.prototype.getLatlngPlain = function() {
-		return this._latlngPlain;
-	};
-
-	Camera.prototype.setMarker = function(marker) {
-		this._marker = marker;
-	};
-
-	Camera.prototype.getMarker = function() {
-		return this._marker;
-	};
-
-	Camera.prototype.getArea = function() {
-		return this._area;
-	};
-
-	//Send PTZ Command to Proxy
-	Camera.prototype._ptzCmdSubmit = function(command) {
-		$.get("./ptzCtrlProxy.php",{'act': command});			
-	};
-
-	Camera.prototype._showNextImage = function() {
-		$.getJSON("./stream_2.php").done(function(image){
-			this._content.attr('src',image.dataUri)
-		}.bind(this)).fail(function(err){
-			console.log("Fallo al obtener la imagen");
-			console.log(err);
-		});
-	};
+            return polygon;
+        });
+        this._timer = null;
+        this._content = null;
+        this._areaPolygon = null;
+        this._marker = null;
+        this.presets = [];
+        this.events = {
+            'scan-finished': []
+        }
+    }
 
 
-	//PTZ Controls
-	Camera.prototype.toLeft = function() {
-		this._ptzCmdSubmit('left');
-	};
+    //Getters and Setters
+    Camera.prototype.getTitle = function () {
+        return this._title;
+    };
 
-	Camera.prototype.toRight = function() {
-		this._ptzCmdSubmit('right');
-	};
+    Camera.prototype.getLatlng = function () {
+        return this._latlng;
+    };
 
-	Camera.prototype.toTop = function() {
-		this._ptzCmdSubmit('up');
-	};
+    Camera.prototype.getLatlngPlain = function () {
+        return this._latlngPlain;
+    };
 
-	Camera.prototype.toBottom = function() {
-		this._ptzCmdSubmit('down');
-	};
+    Camera.prototype.setMarker = function (marker) {
+        this._marker = marker;
+    };
 
-	Camera.prototype.toHome = function() {
-		this._ptzCmdSubmit('home');
-	};
+    Camera.prototype.getMarker = function () {
+        return this._marker;
+    };
 
-	Camera.prototype.stop = function() {
-		this._ptzCmdSubmit('stop');
-	};
+    Camera.prototype.getArea = function () {
+        return this._area;
+    };
 
-	Camera.prototype.verticalScan = function() {
-		this._ptzCmdSubmit('vscan');
-	};
+    Camera.prototype.getPresets = function () {
+        return this.presets;
+    }
 
-	Camera.prototype.horizontalScan = function() {
-		this._ptzCmdSubmit('hscan');
-	};
+    Camera.prototype.showZones = function (map) {
+        console.log("Las zonas");
+        console.log(this._zones);
+        this._zones.forEach(function (zone) {
+            console.log("Zone");
+            console.log(zone);
+            zone.setMap(map);
+        });
+    }
 
-	Camera.prototype.stopScan = function() {
-		this._ptzCmdSubmit('stop');
-	};
+    //Send Command to Proxy
+    Camera.prototype._cmdSubmit = function (params) {
+        $.get("./ptzCtrlProxy.php", params);
+    };
 
-	Camera.prototype.showIn = function($target) {
-		if(!this._content){
-			if(navigator.userAgent.toLowerCase().indexOf('chrome') > -1){
-				this._content = $("<img>",{'width':640,'height':480});
-			}else{
-				if(w.confirm("¿Usar Componente VLC para visualizar Vídeo?")){
-					this._content = $("<object>",{'id':'player'}).append(
-						$("<param>",{'name':'movie','value': this._url}),
-						$("<param>",{'name':'autostart','value':true}),
-						$("<embed>",{
-							'id':'vlc',
-							'type':'application/x-vlc-plugin',
-							'pluginspage':'http://www.videolan.org',
-							'name':'video1',
-							'autoplay':'no',
-							'loop':'no',
-							'width':640,
-							'height':480,
-							'target':this._url
+    Camera.prototype._showNextImage = function () {
+        $.getJSON("./stream_2.php").done(function (image) {
+            this._content.attr('src', image.dataUri)
+        } .bind(this)).fail(function (err) {
+            console.log("Fallo al obtener la imagen");
+            console.log(err);
+        });
+    };
+
+    Camera.prototype._scan = function (direction, seconds, cb) {
+
+        //Left Scan
+        var scanTimer = setInterval(function () {
+            seconds--;
+            this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': direction });
+            console.log("Segundos Restantes");
+            console.log(seconds);
+            if (seconds == 0) { clearTimeout(scanTimer); cb(); }
+        } .bind(this), 1000);
+    }
+
+
+    Camera.prototype._setPresets = function () {
+        var count = this.presets.length + 1;
+        console.log("Estableciendo Presets número " + count);
+        this.presets.push({ 'name': 'Preset Número ' + count, 'id': count });
+        ///hy-cgi/ptz.cgi?cmd=preset&act=set&status=1&number="+num+"'");
+        this._cmdSubmit({ 'cmd': 'preset', 'act': 'set', 'status': 1, 'number': count });
+    }
+
+
+    Camera.prototype._scanPreset = function () {
+        console.log("Move to left");
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'left' });
+        setTimeout(function () {
+            console.log("Init Scan");
+
+            //Init Set Presets
+            this._setPresets();
+            var setPresetsTimer = setInterval(this._setPresets.bind(this), 5750);
+            var moveTimer = setInterval(function () {
+                console.log("move...")
+                this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'right' });
+            } .bind(this), 1000);
+
+
+            setTimeout(function () {
+                console.log("Scan Finished");
+                clearInterval(setPresetsTimer);
+                clearInterval(moveTimer);
+                //go to home
+                this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'home' });
+                setTimeout(function () {
+                    this.triggerEvent('scan-finished');
+                } .bind(this), 24000);
+
+            } .bind(this), 45000);
+
+        } .bind(this), 24000);
+    }
+
+
+    //PTZ Controls
+    Camera.prototype.toLeft = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'left' });
+    };
+
+    Camera.prototype.toRight = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'right' });
+    };
+
+    Camera.prototype.toTop = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'up' });
+    };
+
+    Camera.prototype.toBottom = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'down' });
+    };
+
+    Camera.prototype.toHome = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'home' });
+    };
+
+    Camera.prototype.stop = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'stop' });
+    };
+
+    Camera.prototype.verticalScan = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'vscan' });
+    };
+
+    Camera.prototype.horizontalScan = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'hscan' });
+    };
+
+    Camera.prototype.stopScan = function () {
+        this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'stop' });
+    };
+
+    Camera.prototype.goPreset = function (number) {
+        this._cmdSubmit({ 'cmd': 'preset', 'act': 'goto', 'status': 1, 'number': number });
+    }
+
+    Camera.prototype.showIn = function ($target) {
+        if (!this._content) {
+            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+                this._content = $("<img>", { 'width': 640, 'height': 480 });
+            } else {
+                if (w.confirm("¿Usar Componente VLC para visualizar Vídeo?")) {
+                    this._content = $("<object>", { 'id': 'player' }).append(
+						$("<param>", { 'name': 'movie', 'value': this._url }),
+						$("<param>", { 'name': 'autostart', 'value': true }),
+						$("<embed>", {
+						    'id': 'vlc',
+						    'type': 'application/x-vlc-plugin',
+						    'pluginspage': 'http://www.videolan.org',
+						    'name': 'video1',
+						    'autoplay': 'no',
+						    'loop': 'no',
+						    'width': 640,
+						    'height': 480,
+						    'target': this._url
 						})
 					)
-				}else{
-					this._content = $("<img>",{'width':640,'height':480});
-				}
-			}
-		}
-		this._content.appendTo($target);
-	};
+                } else {
+                    this._content = $("<img>", { 'width': 640, 'height': 480 });
+                }
+            }
+        }
+        this._content.appendTo($target);
+    };
 
-	Camera.prototype.showAreaIn = function(map) {
-		this._area.setMap(map);
-	};
+    Camera.prototype.showAreaIn = function (map) {
+        this._area.setMap(map);
+    };
 
-	Camera.prototype.hideArea = function() {
-		this._area && this._area.setMap(null);
-	};
+    Camera.prototype.hideArea = function () {
+        this._area && this._area.setMap(null);
+    };
 
-	Camera.prototype.animateMarker = function() {
-		this._marker && this._marker.setAnimation(google.maps.Animation.BOUNCE);
-	};
+    Camera.prototype.animateMarker = function () {
+        this._marker && this._marker.setAnimation(google.maps.Animation.BOUNCE);
+    };
 
-	Camera.prototype.stopAnimateMarker = function() {
-		this._marker && this._marker.setAnimation(null);
-	};
-
-
-	Camera.prototype.play = function() {
-		if(this._content.get(0) instanceof HTMLImageElement){
-			//configuramos el timer.
-			this._timer = setInterval(this._showNextImage.bind(this),330);
-		}
-		
-	};
+    Camera.prototype.stopAnimateMarker = function () {
+        this._marker && this._marker.setAnimation(null);
+    };
 
 
-	return Camera;
+    Camera.prototype.play = function () {
+        if (this._content.get(0) instanceof HTMLImageElement) {
+            //configuramos el timer.
+            this._timer = setInterval(this._showNextImage.bind(this), 330);
+        }
+    };
 
 
-})(window,jQuery);
+
+    return Camera;
+
+
+})(EventEmitter, window, jQuery);

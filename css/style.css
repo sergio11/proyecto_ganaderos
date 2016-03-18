@@ -126,40 +126,23 @@ html, body {
 /* Presets */
 
 .controls .presets{
+    margin: 0;
 	margin-bottom: 2rem;
 	position: relative;
 }
 
-.controls .presets > * {
+.controls .presets > .preset {
 	display: inline-block;
 	vertical-align: middle;
 }
 
-.controls .presets .preset_text,
-.controls .presets .btn{
-	padding: 0.4rem 1rem;
-	
+.controls .presets > .preset:not(:first-child) {
+    margin-left: .7rem;
 }
 
-.controls .presets .preset_text::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: #000;
-  font-style: italic;
-}
-.controls .presets .preset_text::-moz-placeholder { /* Firefox 19+ */
-  color: #000;
-  font-style: italic;
-}
-.controls .presets .preset_text:-ms-input-placeholder { /* IE 10+ */
-  color: #000;
-  font-style: italic;
-}
-.controls .presets .preset_text:-moz-placeholder { /* Firefox 18- */
-  color: #000;
-  font-style: italic;
-}
-
-.controls .presets .btn{
-	border:none;
+.controls .presets > .preset a{
+    padding: 0.4rem 1rem;
+    border:none;
 	font-weight: bold;
 	text-decoration: none;
 	text-align: center;
@@ -171,66 +154,11 @@ html, body {
 	cursor: pointer;
 }
 
-
-.controls .presets .btn .fa{
-	vertical-align: middle;
-	margin-left: .5rem;
-}
-
-.controls .presets .btn:hover,
-.controls .presets .btn.active {
+.controls .presets > .preset a:hover,
+.controls .presets > .preset a.active {
 	background-color: #C5951C;
 }
 
-.controls .presets .go_presets{
-	position: absolute;
-	top: 100%; right: 0;
-	width: 50%;
-	height: 200px;
-	opacity: 0;
-	background-color: #fff;
-	border-radius: 3px;
-	list-style: none;
-	list-style-position: outside;
-	-webkit-transition: opacity .5s;
-	transition: opacity .5s;
-	margin: 1rem 0;
-}
-
-.controls .presets .go_presets .preset:not(:last-child){
-	margin-bottom: 1rem;
-}
-
-.controls .presets .go_presets .preset a{
-	padding: .3rem .4rem;
-	border-radius: 2px;
-	-webkit-trasition: all .5s;
-	transition: all .5s;
-}
-
-.controls .presets .go_presets .preset .fa{
-	color: #fff;
-}
-
-.controls .presets .go_presets .preset .go{
-	background-color: #C5951C;
-}
-
-.controls .presets .go_presets .preset .go:hover{
-	background-color: #AA8528;
-}
-
-.controls .presets .go_presets .preset .delete{
-	background-color: #DA202D;
-}
-
-.controls .presets .go_presets .preset .delete:hover{
-	background-color: #A7242E;
-}
-
-.controls .presets .go_presets.collapsible{
-	opacity: 1;
-}
 
 
 /*

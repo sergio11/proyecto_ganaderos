@@ -6,11 +6,10 @@
 	*   where cmd can be 'up','down','left','right','stop'
 	*/
 
-	if(isset($_GET['act']) && !empty($_GET['act'])){
-		$act = strtolower(trim(strip_tags($_GET['act'])));
+	if(isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])){
 		$username='admin';
 		$password='123456';
-		$URL="http://212.128.154.128/hy-cgi/ptz.cgi?cmd=ptzctrl&act=$act";
+		$URL="http://212.128.154.128/hy-cgi/ptz.cgi?".$_SERVER['QUERY_STRING'];
 		$handler = fopen('./proxy-error.log','w');
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $URL);

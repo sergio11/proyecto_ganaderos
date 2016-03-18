@@ -14,6 +14,7 @@ var ControlPanel = (function (_super, w, $) {
     }
 
     ControlPanel.prototype.init = function () {
+
         //Activamos por defecto la primera cámara
         this._current = this._cameras[this._current];
         this._current.showIn(this._$container);
@@ -76,7 +77,6 @@ var ControlPanel = (function (_super, w, $) {
 
         $("#showPresets").on("click", function (e) {
             e.preventDefault();
-            console.log("Show presets ...");
             $(this).toggleClass("active").next().toggleClass("collapsible");
 
         });
@@ -86,6 +86,31 @@ var ControlPanel = (function (_super, w, $) {
         });
 
 
+        this._current.addEventListener("scan-finished", function () {
+            console.log("Scan Finalizado ...");
+            var presets = this.getPresets();
+            var $fragment = $(document.createDocumentFragment());
+            for (var i = 0; i < presets.length; i++) {
+                $fragment.append(
+                    $("<li>", { 'class': 'preset' }).append(
+                        $("<a>", { 'text': presets[i].id, 'href': '#', 'data-preset': presets[i].id })
+                    )
+                 );
+            }
+            $("#presets").append($fragment);
+        });
+
+        var self = this;
+        $("#presets").on("click", "[data-preset]", function (e) {
+            e.preventDefault();
+            var preset = this.dataset.preset;
+            var $this = $(this);
+            if (!$this.hasClass("active")) {
+                $this.addClass("active").parent().siblings().children().removeClass("active");
+                self._current.goPreset(preset);
+            }
+
+        });
 
     };
 

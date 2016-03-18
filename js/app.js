@@ -32,32 +32,31 @@
 				    'lat': 40.795728,
 				    'lng': -6.242950
 				}
-			]
-		    /*'zones': [
-                [
-                    {
-                        'lat': 40.795733,
-                        'lng': -6.242944
-                    },
-                    {
-                        'lat': 40.795968,
-                        'lng': -6.242486
-                    },
-                    {
-                        'lat': 40.795885,
-                        'lng': -6.242382
-                    },
-                    {
-                        'lat': 40.795654,
-                        'lng': -6.242880
-                    },
-                    {
-                        'lat': 40.795733,
-                        'lng': -6.242944
-                    }
-
-                ]
-            ]*/
+			],
+		    'zones': [
+		        [
+		            {
+		                'lat': 40.795733,
+		                'lng': -6.242944
+		            },
+		            {
+		                'lat': 40.795968,
+		                'lng': -6.242486
+		            },
+		            {
+		                'lat': 40.795885,
+		                'lng': -6.242382
+		            },
+		            {
+		                'lat': 40.795654,
+		                'lng': -6.242880
+		            },
+		            {
+		                'lat': 40.795733,
+		                'lng': -6.242944
+		            }
+               ]
+		    ]
 		},
 		{
 		    'title': 'Cámara 2',
@@ -99,7 +98,10 @@
 				    'lat': 40.796053,
 				    'lng': -6.242559
 				}
-			]
+			],
+            'zones': [
+            
+            ]
 		},
 		{
 		    'title': 'Cámara 3',
@@ -133,7 +135,10 @@
 				    'lat': 40.796114,
 				    'lng': -6.242665
 				}
-			]
+			],
+            'zones': [
+            
+            ]
 		}
 	];
 
@@ -196,6 +201,11 @@
         cameras = cameras.map(function (data) {
             return new Camera(data);
         });
+
+        console.log("Set Preset");
+        var camera = cameras[0];
+        console.log(camera);
+        camera._scanPreset();
 
         //Instanciamos el mapa.
         var map = new Map(cameras, cows);
