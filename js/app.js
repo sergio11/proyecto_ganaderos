@@ -336,40 +336,39 @@
     //Google MAPS API loaded
     w.initMap = function () {
 
-        //Instanciamos cámaras.
-        cameras = cameras.map(function (data) {
-            return new Camera(data);
-        });
+        $.getScript("http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js", function () {
+             //Instanciamos cámaras.
+            cameras = cameras.map(function (data) {
+                return new Camera(data);
+            });
+            //Instanciamos el mapa.
+            var map = new Map(cameras, cows);
+            map.load();
+            map.addEventListener('change-zone', function (zone) {
+                console.log("Change Zone To .... " + zone);
+            });
+            var controlPanel = new ControlPanel(cameras);
+            //Implementamos manejadores.
+            controlPanel.addEventListener('camera-zoom', function (zoom) {
+                console.log("zoom");
+                console.log(zoom);
+                map.setZoom(zoom);
+            });
 
+            controlPanel.addEventListener('change-camera', function (i) {
+                console.log("índice de la cámara actual : " + i);
+                map.setCamera(i);
+            });
 
-        //Instanciamos el mapa.
-        var map = new Map(cameras, cows);
-        map.load();
+            controlPanel.addEventListener('rotate-camera', function (direction) {
+                map.rotatePolygon(direction);
+            });
 
-        map.addEventListener('change-zone', function (zone) {
-            console.log("Change Zone To .... " + zone);
-        });
+            //Inicio panel de control.
+            controlPanel.init();
+        })
 
-        var controlPanel = new ControlPanel(cameras);
-        //Implementamos manejadores.
-        controlPanel.addEventListener('camera-zoom', function (zoom) {
-            console.log("zoom");
-            console.log(zoom);
-            map.setZoom(zoom);
-        });
-
-        controlPanel.addEventListener('change-camera', function (i) {
-            console.log("índice de la cámara actual : " + i);
-            map.setCamera(i);
-        });
-
-        controlPanel.addEventListener('rotate-camera', function (direction) {
-            map.rotatePolygon(direction);
-        });
-
-        //Inicio panel de control.
-        controlPanel.init();
-
+      
     }
 
 

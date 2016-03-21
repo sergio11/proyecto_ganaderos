@@ -18,21 +18,7 @@ var Camera = (function (_super, w, $) {
             draggable: false,
             geodesic: true
         });
-        this._zones = options.zones.map(function (zone, idx) {
-            var polygon = new google.maps.Polygon({
-                strokeColor: '#DAA520',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#DAA520',
-                fillOpacity: 0.2
-            });
-            polygon.idx = idx + 1;
-            polygon.setPath(zone.map(function (poit) {
-                return new google.maps.LatLng(poit.lat, poit.lng);
-            }));
-
-            return polygon;
-        });
+        this._zones = this._createZones(options.zones);
         this._timer = null;
         this._content = null;
         this._areaPolygon = null;
@@ -75,6 +61,42 @@ var Camera = (function (_super, w, $) {
 
     Camera.prototype.getPresets = function () {
         return this.presets;
+    }
+
+    Camera.prototype._createZones = function(zones){
+        return zones.map(function (zone, idx) {
+            var bounds = new google.maps.LatLngBounds();
+            var polygon = new google.maps.Polygon({
+                strokeColor: '#DAA520',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#DAA520',
+                fillOpacity: 0.2
+            });
+            polygon.idx = ++idx;
+            var zones = zone.map(function (poit) {
+                return new google.maps.LatLng(poit.lat, poit.lng);
+            });
+            polygon.setPath(zones);
+            for (var i = 0, len = zones.length; i < len; i++) bounds.extend(zones[i]);
+            var center = bounds.getCenter();
+            polygon.label = new InfoBox({
+                content: "Zone " + polygon.idx,
+                boxStyle: {
+                    textAlign: "center",
+                    color: "#fff",
+                    fontSize: "22pt"
+                },
+                disableAutoPan: true,
+                pixelOffset: new google.maps.Size(-25, 0),
+                position: center,
+                closeBoxURL: "",
+                isHidden: false,
+                enableEventPropagation: true
+            });
+
+            return polygon;
+        });
     }
 
     //Send Command to Proxy

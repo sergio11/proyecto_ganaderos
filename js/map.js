@@ -93,12 +93,13 @@ var Map = (function (_super, w) {
         });
         //mostramos zona
         this._currentZone.setMap(this._map);
+        this._currentZone.label.open(this._map);
         //this._setCurrentTarget(cow.marker.getPosition());
         this._attachInfoWindows(cow.marker, this._cows[cow.marker.idx].content);
         //Ajustamos el mapa.
         this._fitMap(cow.marker.getPosition());
         //Notificamos cambio de zona.
-        this.triggerEvent('change-zone',this._currentZone.idx);
+        this.triggerEvent('change-zone', this._currentZone.idx);
     };
 
     //Cambia Objetivo de la cámara
