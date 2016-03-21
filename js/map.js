@@ -12,6 +12,7 @@ var Map = (function (_super, w) {
         this._cameras = cameras;
         this._cows = cows;
         this._currentCamera = null;
+        this._currentZone = null;
         //Intanciamos mapa
         this._map = new google.maps.Map(document.getElementById('map'), {
             center: new google.maps.LatLng(default_center.lat, default_center.lng),
@@ -23,15 +24,18 @@ var Map = (function (_super, w) {
         });
         //Instanciamos la InfoWindows.
         this._infowindow = new google.maps.InfoWindow();
-        this._polygon = new google.maps.Polygon({
-            strokeColor: '#DAA520',
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: '#DAA520',
-            fillOpacity: 0.35
-        });
+        /*this._polygon = new google.maps.Polygon({
+        strokeColor: '#DAA520',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#DAA520',
+        fillOpacity: 0.35
+        });*/
         this.angle = 0;
         this.limit_exceeded;
+        this.events = {
+            'change-zone': []
+        }
 
     }
 
@@ -80,8 +84,21 @@ var Map = (function (_super, w) {
                 google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), camera.getArea()) && this.setCamera(camera);
             } .bind(this));
         }
-        this._setCurrentTarget(cow.marker.getPosition());
+        //desactivamos zona actual.
+        this._currentZone && this._currentZone.setMap(null);
+        //obtenemos zonas
+        var zones = this._currentCamera.getZones();
+        this._currentZone = zones.find(function (zone) {
+            return google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), zone);
+        });
+        //mostramos zona
+        this._currentZone.setMap(this._map);
+        //this._setCurrentTarget(cow.marker.getPosition());
         this._attachInfoWindows(cow.marker, this._cows[cow.marker.idx].content);
+        //Ajustamos el mapa.
+        this._fitMap(cow.marker.getPosition());
+        //Notificamos cambio de zona.
+        this.triggerEvent('change-zone',this._currentZone.idx);
     };
 
     //Cambia Objetivo de la cámara
@@ -96,9 +113,9 @@ var Map = (function (_super, w) {
         var v1 = new google.maps.geometry.spherical.computeOffsetOrigin(camera, distancia, angle + angle_offset);
         var v2 = new google.maps.geometry.spherical.computeOffsetOrigin(camera, distancia, angle - angle_offset);
         //Establece path del polígono para que apunte al destino
-        this._polygon.setPath([camera, v1, v2, camera]);
+        //this._polygon.setPath([camera, v1, v2, camera]);
         this.angle = angle;
-        this._polygon.setMap(this._map);
+        //this._polygon.setMap(this._map);
     };
 
     //Establece el zoom del Mapa
@@ -116,7 +133,7 @@ var Map = (function (_super, w) {
         //cerramos info windows
         this._infowindow.close();
         //ocultamos polígono proyección
-        this._polygon.setMap(null);
+        //this._polygon.setMap(null);
         //ocultamos area activa.
         this._currentCamera && this._currentCamera.hideArea();
         //guardamos referencia a la nueva cámara activa
@@ -145,8 +162,7 @@ var Map = (function (_super, w) {
                 this._onChangeMarker(marker);
                 }*/
                 camera.setMarker(marker);
-                //Mostramos zones
-                camera.showZones(this._map);
+
 
             } .bind(this))(this._cameras[i]);
 
@@ -178,18 +194,18 @@ var Map = (function (_super, w) {
     //Rota el Polígono
     Map.prototype.rotatePolygon = function (direction) {
 
-        if (this.limit_exceeded != direction && google.maps.geometry.poly.containsLocation(this._polygon.getCenter(), this._currentCamera.getArea())) {
-            this.limit_exceeded = null;
-            if (direction == "left") {
-                this.angle -= 0.1;
-                this._polygon.rotate(-0.1, this._currentCamera.getLatlng());
-            } else {
-                this.angle += 0.1;
-                this._polygon.rotate(0.1, this._currentCamera.getLatlng());
-            }
+        /*if (this.limit_exceeded != direction && google.maps.geometry.poly.containsLocation(this._polygon.getCenter(), this._currentCamera.getArea())) {
+        this.limit_exceeded = null;
+        if (direction == "left") {
+        this.angle -= 0.1;
+        this._polygon.rotate(-0.1, this._currentCamera.getLatlng());
         } else {
-            this.limit_exceeded = direction;
+        this.angle += 0.1;
+        this._polygon.rotate(0.1, this._currentCamera.getLatlng());
         }
+        } else {
+        this.limit_exceeded = direction;
+        }*/
 
 
 

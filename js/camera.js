@@ -18,14 +18,15 @@ var Camera = (function (_super, w, $) {
             draggable: false,
             geodesic: true
         });
-        this._zones = options.zones.map(function (zone) {
+        this._zones = options.zones.map(function (zone, idx) {
             var polygon = new google.maps.Polygon({
-                strokeColor: '#0D6F90',
+                strokeColor: '#DAA520',
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
-                fillColor: '#22B8EB',
-                fillOpacity: 0.35
+                fillColor: '#DAA520',
+                fillOpacity: 0.2
             });
+            polygon.idx = idx + 1;
             polygon.setPath(zone.map(function (poit) {
                 return new google.maps.LatLng(poit.lat, poit.lng);
             }));
@@ -68,18 +69,12 @@ var Camera = (function (_super, w, $) {
         return this._area;
     };
 
-    Camera.prototype.getPresets = function () {
-        return this.presets;
+    Camera.prototype.getZones = function () {
+        return this._zones;
     }
 
-    Camera.prototype.showZones = function (map) {
-        console.log("Las zonas");
-        console.log(this._zones);
-        this._zones.forEach(function (zone) {
-            console.log("Zone");
-            console.log(zone);
-            zone.setMap(map);
-        });
+    Camera.prototype.getPresets = function () {
+        return this.presets;
     }
 
     //Send Command to Proxy
@@ -123,10 +118,9 @@ var Camera = (function (_super, w, $) {
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'left' });
         setTimeout(function () {
             console.log("Init Scan");
-
-            //Init Set Presets
             this._setPresets();
-            var setPresetsTimer = setInterval(this._setPresets.bind(this), 5750);
+            //Init Set Presets
+            var setPresetsTimer = setInterval(this._setPresets.bind(this), 8000);
             var moveTimer = setInterval(function () {
                 console.log("move...")
                 this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'right' });
@@ -137,6 +131,8 @@ var Camera = (function (_super, w, $) {
                 console.log("Scan Finished");
                 clearInterval(setPresetsTimer);
                 clearInterval(moveTimer);
+                //Final Preset
+                this._setPresets();
                 //go to home
                 this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'home' });
                 setTimeout(function () {
