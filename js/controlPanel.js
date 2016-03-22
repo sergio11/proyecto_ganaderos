@@ -4,7 +4,7 @@ var ControlPanel = (function (_super, w, $) {
 
     function ControlPanel(cameras) {
         this._cameras = cameras;
-        this._current = 0;
+        this._current = 1;
         this._$container = $("#container");
         this.events = {
             'rotate-camera': [],
@@ -16,7 +16,7 @@ var ControlPanel = (function (_super, w, $) {
     ControlPanel.prototype.init = function () {
 
         //Activamos por defecto la primera cámara
-        this._current = this._cameras[this._current];
+        this._current = this._cameras[1];
         this._current.showIn(this._$container);
         //this._current._scanPreset();
         //Funcionalidad para los controles.
@@ -126,13 +126,17 @@ var ControlPanel = (function (_super, w, $) {
                     }, Math.abs((currentPreset * intervalPreset) - (preset * intervalPreset)));
                 }
             } else {
-                console.log("L cámara se está moviendo");
+                console.log("La cámara se está moviendo");
             }
 
         });
 
     };
 
+    ControlPanel.prototype.activePreset = function (number) {
+        $("#presets").find("[data-preset]").removeClass("active").eq(number - 1).addClass("active");
+        this._current.goPreset(number);
+    }
 
     return ControlPanel;
 

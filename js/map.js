@@ -73,6 +73,39 @@ var Map = (function (_super, w) {
         this._infowindow.setContent(popup);
     };
 
+    Map.prototype._createZoneFor = function (zone, idx) {
+        //Polygon
+        var polygon = new google.maps.Polygon({
+            strokeColor: '#DAA520',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#DAA520',
+            fillOpacity: 0.2
+        });
+        var zones = zone.map(function (poit) {
+            return new google.maps.LatLng(poit.lat, poit.lng);
+        });
+        polygon.idx = idx + 1;
+        polygon.setPath(zones);
+        //Info Box
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0, len = zones.length; i < len; i++) bounds.extend(zones[i]);
+        polygon.label = new InfoBox({
+            content: "Zone " + polygon.idx,
+            boxStyle: {
+                textAlign: "center",
+                color: "#fff",
+                fontSize: "22pt"
+            },
+            disableAutoPan: true,
+            position: bounds.getCenter(),
+            closeBoxURL: "",
+            isHidden: false,
+            enableEventPropagation: true
+        });
+        return polygon;
+    }
+
     //Manejador evento click sobre marker tipo cámara.
     Map.prototype._onClickCamera = function (camera) {
         this.setCamera(camera);
@@ -85,21 +118,27 @@ var Map = (function (_super, w) {
             } .bind(this));
         }
         //desactivamos zona actual.
-        this._currentZone && this._currentZone.setMap(null);
+        if (this._currentZone) {
+            this._currentZone.setMap(null);
+            this._currentZone.label.open(null);
+        }
         //obtenemos zonas
         var zones = this._currentCamera.getZones();
+        console.log("Zonas");
+        console.log(zones);
         this._currentZone = zones.find(function (zone) {
             return google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), zone);
         });
-        //mostramos zona
+
         this._currentZone.setMap(this._map);
         this._currentZone.label.open(this._map);
+
         //this._setCurrentTarget(cow.marker.getPosition());
         this._attachInfoWindows(cow.marker, this._cows[cow.marker.idx].content);
         //Ajustamos el mapa.
         this._fitMap(cow.marker.getPosition());
         //Notificamos cambio de zona.
-        this.triggerEvent('change-zone', this._currentZone.idx);
+        this.triggerEvent('change-zone', this._currentZone);
     };
 
     //Cambia Objetivo de la cámara
@@ -135,8 +174,9 @@ var Map = (function (_super, w) {
         this._infowindow.close();
         //ocultamos polígono proyección
         //this._polygon.setMap(null);
-        //ocultamos area activa.
-        this._currentCamera && this._currentCamera.hideArea();
+        //Ocultamos la area activa.
+        this._currentCamera && this._currentCamera.getArea().setMap(null);
+        this._currentZone && this._currentZone.setMap(null)
         //guardamos referencia a la nueva cámara activa
         this._currentCamera = camera;
         this._cameras.forEach(function (camera) {
@@ -144,7 +184,8 @@ var Map = (function (_super, w) {
         });
         this._currentCamera.animateMarker();
         this._map.setCenter(camera.getLatlng());
-        camera.showAreaIn(this._map);
+
+        this._currentCamera.getArea().setMap(this._map);
     }
 
     Map.prototype.load = function () {
@@ -164,7 +205,18 @@ var Map = (function (_super, w) {
                 }*/
                 camera.setMarker(marker);
 
+                camera.setArea(new google.maps.Polygon({
+                    paths: camera.getArea(),
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.15,
+                    draggable: false,
+                    geodesic: true
+                }));
 
+                camera.setZones(camera.getZones().map(this._createZoneFor.bind(this)));
             } .bind(this))(this._cameras[i]);
 
         //Cargamos los objetivos
@@ -188,7 +240,7 @@ var Map = (function (_super, w) {
             } .bind(this))(this._cows[i]);
 
         //Establecemos la cámara por defecto
-        this.setCamera(this._cameras[0]);
+        this.setCamera(this._cameras[1]);
 
     };
 

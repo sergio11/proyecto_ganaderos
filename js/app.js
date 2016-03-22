@@ -277,6 +277,153 @@
 			],
 		    'zones': [
 
+                [
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    },
+                    {
+                        'lat': 40.796569,
+                        'lng': -6.242641
+                    },
+                    {
+                        'lat': 40.796831,
+                        'lng': -6.242896
+                    },
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    }
+                ],
+                [
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    },
+                    {
+                        'lat': 40.796831,
+                        'lng': -6.242896
+                    },
+                    {
+                        'lat': 40.796735,
+                        'lng': -6.243080
+                    },
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    }
+                ],
+                [
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    },
+                    {
+                        'lat': 40.796735,
+                        'lng': -6.243080
+                    },
+                    {
+                        'lat': 40.796625,
+                        'lng': -6.243262
+                    },
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    }
+                ],
+                [
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    },
+                    {
+                        'lat': 40.796625,
+                        'lng': -6.243262
+                    },
+                    {
+                        'lat': 40.796512,
+                        'lng': -6.243456
+                    },
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    }
+                ],
+                [
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    },
+                    {
+                        'lat': 40.796512,
+                        'lng': -6.243456
+                    },
+                    {
+                        'lat': 40.796388,
+                        'lng': -6.243664
+                    },
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    }
+                ],
+                [
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    },
+                    {
+                        'lat': 40.796388,
+                        'lng': -6.243664
+                    },
+                    {
+                        'lat': 40.796171,
+                        'lng': -6.243472
+                    },
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    }
+                ],
+                [
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    },
+                    {
+                        'lat': 40.796171,
+                        'lng': -6.243472
+                    },
+                    {
+                        'lat': 40.796007,
+                        'lng': -6.243312
+                    },
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    }
+                ],
+                [
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    },
+                    {
+                        'lat': 40.796007,
+                        'lng': -6.243312
+                    },
+                    {
+                        'lat': 40.795865,
+                        'lng': -6.243187
+                    },
+                    {
+                        'lat': 40.796114,
+                        'lng': -6.242665
+                    }
+                ]
+
+
+
             ]
 		}
 	];
@@ -337,7 +484,7 @@
     w.initMap = function () {
 
         $.getScript("http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js", function () {
-             //Instanciamos cámaras.
+            //Instanciamos cámaras.
             cameras = cameras.map(function (data) {
                 return new Camera(data);
             });
@@ -345,7 +492,9 @@
             var map = new Map(cameras, cows);
             map.load();
             map.addEventListener('change-zone', function (zone) {
-                console.log("Change Zone To .... " + zone);
+                console.log("Change Zone To .... ");
+                console.log(zone);
+                controlPanel.activePreset(zone.idx);
             });
             var controlPanel = new ControlPanel(cameras);
             //Implementamos manejadores.
@@ -368,7 +517,7 @@
             controlPanel.init();
         })
 
-      
+
     }
 
 
