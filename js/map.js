@@ -95,7 +95,7 @@ var Map = (function (_super, w) {
             boxStyle: {
                 textAlign: "center",
                 color: "#fff",
-                fontSize: "22pt"
+                fontSize: "12pt"
             },
             disableAutoPan: true,
             position: bounds.getCenter(),
@@ -112,33 +112,34 @@ var Map = (function (_super, w) {
     };
 
     Map.prototype._onClickCow = function (cow) {
-        if (!google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), this._currentCamera.getArea())) {
-            this._cameras.forEach(function (camera) {
-                google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), camera.getArea()) && this.setCamera(camera);
-            } .bind(this));
-        }
-        //desactivamos zona actual.
-        if (this._currentZone) {
-            this._currentZone.setMap(null);
-            this._currentZone.label.open(null);
-        }
-        //obtenemos zonas
-        var zones = this._currentCamera.getZones();
-        console.log("Zonas");
-        console.log(zones);
-        this._currentZone = zones.find(function (zone) {
-            return google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), zone);
-        });
+        console.log("isMove : " + this._currentCamera.isMove());
+        if (!this._currentCamera.isMove()) {
 
-        this._currentZone.setMap(this._map);
-        this._currentZone.label.open(this._map);
+            if (!google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), this._currentCamera.getArea())) {
+                this._cameras.forEach(function (camera) {
+                    google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), camera.getArea()) && this.setCamera(camera);
+                } .bind(this));
+            }
 
-        //this._setCurrentTarget(cow.marker.getPosition());
-        this._attachInfoWindows(cow.marker, this._cows[cow.marker.idx].content);
-        //Ajustamos el mapa.
-        this._fitMap(cow.marker.getPosition());
-        //Notificamos cambio de zona.
-        this.triggerEvent('change-zone', this._currentZone);
+            //obtenemos zonas
+            var zones = this._currentCamera.getZones();
+            var zone = zones.find(function (zone) {
+                return google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), zone);
+            });
+
+            this.activeZone(zone);
+
+            //this._setCurrentTarget(cow.marker.getPosition());
+            this._attachInfoWindows(cow.marker, this._cows[cow.marker.idx].content);
+            //Ajustamos el mapa.
+            this._fitMap(cow.marker.getPosition());
+            //Notificamos cambio de zona.
+            this.triggerEvent('change-zone', this._currentZone);
+
+        } else {
+            console.log("La cámara se está moviendo !!!!");
+        }
+
     };
 
     //Cambia Objetivo de la cámara
@@ -186,6 +187,22 @@ var Map = (function (_super, w) {
         this._map.setCenter(camera.getLatlng());
 
         this._currentCamera.getArea().setMap(this._map);
+    }
+
+    //Active Zone
+    Map.prototype.activeZone = function (zone) {
+        console.log("Active Zone ");
+        console.log(zone);
+        //desactivamos zona actual.
+        if (this._currentZone) {
+            this._currentZone.setMap(null);
+            this._currentZone.label.open(null);
+        }
+
+        zone.setMap(this._map);
+        zone.label.open(this._map);
+
+        this._currentZone = zone;
     }
 
     Map.prototype.load = function () {

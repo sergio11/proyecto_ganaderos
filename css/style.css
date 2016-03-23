@@ -8,6 +8,74 @@ html, body {
 	display: none;
 }
 
+/* Buttons */
+.btn {
+    border: none;
+    border-radius: 4px;
+    padding: .5rem 1rem;
+    background-color: #DAA520;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    -webkit-transition:  all .5s;
+    transition: all .5s;
+}
+
+.btn:hover, .btn:active {
+    background-color: #A27B1A;
+}
+
+/* Overlay */
+.overlay, .overlay-body , .loader{
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+}
+
+.overlay{
+    background-color: rgba(0,0,0,0.6);
+    z-index: 999;
+    opacity: 0;
+    -webkit-transform: translateY(100%);
+    transform: translateY(100%);
+    -webkit-transition: -webkit-transform .5s , opacity .6s;
+    transition: transform .5s , opacity .6s;
+}
+
+.overlay.active {
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.overlay .overlay-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    color: #fff;
+    font-size: 2rem;
+}
+
+.overlay-body {
+    background-color: #fff;
+    width: 30%;
+    height: 40%;
+    border-radius: 8px;
+    margin: auto;
+}
+
+.overlay-body .loader {
+    margin: auto;
+}
+
+.overlay-body .overlay-title {
+    text-align: center;
+    color: #DAA520;
+    font-size: 2rem;
+}
+
+
+
+
+
 .wrapper{
 	width: 90%;
 	height: 85%;

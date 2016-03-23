@@ -509,6 +509,14 @@
                 map.setCamera(i);
             });
 
+            controlPanel.addEventListener('change-preset', function (preset) {
+                console.log("change-preset ... " + preset);
+                var zones = controlPanel.getCurrentCamera().getZones();
+                map.activeZone(zones.find(function (zone) {
+                    return zone.idx == preset;
+                }));
+            });
+
             controlPanel.addEventListener('rotate-camera', function (direction) {
                 map.rotatePolygon(direction);
             });

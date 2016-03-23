@@ -17,6 +17,7 @@ var Camera = (function (_super, w, $) {
         this._areaPolygon = null;
         this._marker = null;
         this.presets = [];
+        this._isMove = false;
         this.events = {
             'scan-finished': []
         }
@@ -64,6 +65,14 @@ var Camera = (function (_super, w, $) {
         return this.presets;
     }
 
+    Camera.prototype.setIsMove = function (val) {
+        this._isMove = val;
+    }
+
+    Camera.prototype.isMove = function () {
+        return this._isMove;
+    }
+
     //Send Command to Proxy
     Camera.prototype._cmdSubmit = function (params) {
         $.get("./ptzCtrlProxy.php", params);
@@ -87,7 +96,8 @@ var Camera = (function (_super, w, $) {
     }
 
 
-    Camera.prototype._scanPreset = function () {
+    Camera.prototype.scanPreset = function () {
+        this.presets = [];
         console.log("Move to left");
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'left' });
         setTimeout(function () {
@@ -167,13 +177,13 @@ var Camera = (function (_super, w, $) {
                 if (w.confirm("¿Usar Componente VLC para visualizar Vídeo?")) {
                     this._content = $("<object>", { 'id': 'player' }).append(
 						$("<param>", { 'name': 'movie', 'value': this._url }),
-						$("<param>", { 'name': 'autostart', 'value': true }),
+                        $("<param>", { 'name': 'autoplay', 'value': 'true' }),
 						$("<embed>", {
 						    'id': 'vlc',
 						    'type': 'application/x-vlc-plugin',
 						    'pluginspage': 'http://www.videolan.org',
 						    'name': 'video1',
-						    'autoplay': 'no',
+						    'autoplay': 'yes',
 						    'loop': 'no',
 						    'width': 640,
 						    'height': 480,

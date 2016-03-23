@@ -50,6 +50,7 @@
 						</div>
 						<div class="others-controls">
 							<ul class="presets" id="presets"></ul>
+                            <a href="#" class="btn" id="resetPresets">Reset Presets</a>
 							<input type="range" id='zoom' name="zoom" min="15" max="20" value="18">
 						</div>
 						
@@ -67,12 +68,21 @@
 		<h3 class="popup-header" data-cow-name>Uluru</h3>
 		<div class="popup-body">
 			<figure>
-				<img src="./img/vaca.jpg" width="120">
+				<img src="./img/vaca.jpg" width="120" alt="vaca">
 				<figcaption data-cow-desc></figcaption>
 			</figure>
 		</div>
 	</div>
 
+    <!-- Loading overlay-->
+    <div class="overlay" id="overlay">
+        <div class="overlay-body">
+            <h4 class="overlay-title">Configurando Presets</h4>
+            <img src="./img/loader.gif" class="loader" alt="loader"/>
+        </div>   
+    </div>
+
+    
 
 <script type="text/javascript" src="./bower_components/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="./js/common.js"></script>
