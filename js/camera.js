@@ -176,14 +176,13 @@ var Camera = (function (_super, w, $) {
             } else {
                 if (w.confirm("¿Usar Componente VLC para visualizar Vídeo?")) {
                     this._content = $("<object>", { 'id': 'player' }).append(
+                        $("<param>", {'name': 'autostart', 'value': 'true'}),
 						$("<param>", { 'name': 'movie', 'value': this._url }),
-                        $("<param>", { 'name': 'autoplay', 'value': 'true' }),
 						$("<embed>", {
 						    'id': 'vlc',
 						    'type': 'application/x-vlc-plugin',
 						    'pluginspage': 'http://www.videolan.org',
 						    'name': 'video1',
-						    'autoplay': 'yes',
 						    'loop': 'no',
 						    'width': 640,
 						    'height': 480,

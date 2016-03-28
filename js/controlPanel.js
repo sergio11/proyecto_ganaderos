@@ -27,6 +27,7 @@ var ControlPanel = (function (_super, w, $) {
         //Activamos por defecto la primera cámara
         this._current = this._cameras[1];
         this._current.showIn(this._$container);
+        //vlc.playlist.play();
         //this._current._scanPreset();
         //Funcionalidad para los controles.
         var self = this, timer = null;
@@ -121,12 +122,14 @@ var ControlPanel = (function (_super, w, $) {
 
         var self = this, currentPreset = 4, intervalPreset = 5625;
         $("#presets").on("click", "[data-preset]", function (e) {
+            console.log("Preset Pulsado ....");
+            console.log(e);
             e.preventDefault();
             if (!self._current.isMove()) {
                 var preset = this.dataset.preset;
                 var $this = $(this);
                 if (!$this.hasClass("active")) {
-                    
+                    self._current.goPreset(preset);
                 }
             } else {
                 console.log("La cámara se está moviendo");
