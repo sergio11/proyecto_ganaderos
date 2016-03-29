@@ -57,6 +57,10 @@ var Camera = (function (_super, w, $) {
         return this._zones;
     }
 
+    Camera.prototype.getCountZones = function () {
+        return this._zones.length;
+    }
+
     Camera.prototype.setZones = function (zones) {
         this._zones = zones;
     }
@@ -105,8 +109,17 @@ var Camera = (function (_super, w, $) {
             //Init Set Presets
             console.log("Estas son las zones");
             console.log(this._zones.length);
-            console.log(totalTime / this._zones.length * 1000);
-            var setPresetsTimer = setInterval(this._setPresets.bind(this), totalTime / this._zones.length * 1000);
+
+            var setPresetsTimer = null;
+            var interval = Math.floor(totalTime / this._zones.length * 1000);
+            var delay = interval / 2;
+            console.log("Interval : " + interval);
+            console.log("Delay : " + delay);
+            setTimeout(function () {
+                this._setPresets();
+                setPresetsTimer = setInterval(this._setPresets.bind(this), interval);
+            } .bind(this), delay);
+
             var moveTimer = setInterval(function () {
                 console.log("move...")
                 this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'right' });
@@ -116,11 +129,8 @@ var Camera = (function (_super, w, $) {
                 console.log("Scan Finished");
                 clearInterval(setPresetsTimer);
                 clearInterval(moveTimer);
-                //go to home
-                this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'home' });
-                setTimeout(function () {
-                    this.triggerEvent('scan-finished');
-                } .bind(this), 24000);
+                this.triggerEvent('scan-finished');
+
 
             } .bind(this), 45000);
 
@@ -176,7 +186,7 @@ var Camera = (function (_super, w, $) {
             } else {
                 if (w.confirm("¿Usar Componente VLC para visualizar Vídeo?")) {
                     this._content = $("<object>", { 'id': 'player' }).append(
-                        $("<param>", {'name': 'autostart', 'value': 'true'}),
+                        $("<param>", { 'name': 'autostart', 'value': 'true' }),
 						$("<param>", { 'name': 'movie', 'value': this._url }),
 						$("<embed>", {
 						    'id': 'vlc',

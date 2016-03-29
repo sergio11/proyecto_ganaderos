@@ -106,9 +106,16 @@ var ControlPanel = (function (_super, w, $) {
             //Scan Finished Handler
             this._current.addEventListener("scan-finished", function () {
                 this._createPresetsBar();
+                var zones = this._current.getCountZones();
+                var preset = Math.round(zones / 2);
+                //active preset.
+                this.activePreset(preset);
+                this._current.setIsMove(true);
                 $overlay.removeClass("active");
                 $("#player").fadeIn(1000);
-
+                setTimeout(function () {
+                    this._current.setIsMove(false);
+                } .bind(this), 45 / zones * preset * 1000);
             } .bind(this), true);
 
         } .bind(this));
@@ -118,18 +125,15 @@ var ControlPanel = (function (_super, w, $) {
             self.triggerEvent('camera-zoom', parseInt(this.value));
         });
 
-
-
         var self = this, currentPreset = 4, intervalPreset = 5625;
         $("#presets").on("click", "[data-preset]", function (e) {
-            console.log("Preset Pulsado ....");
-            console.log(e);
             e.preventDefault();
             if (!self._current.isMove()) {
                 var preset = this.dataset.preset;
                 var $this = $(this);
                 if (!$this.hasClass("active")) {
-                    self._current.goPreset(preset);
+                    $this.addClass("active");
+                    self.activePreset(preset);
                 }
             } else {
                 console.log("La cámara se está moviendo");
@@ -164,6 +168,8 @@ var ControlPanel = (function (_super, w, $) {
 
         $("#presets").find("[data-preset]").removeClass("active").eq(number - 1).addClass("active");
         this._current.goPreset(number);
+        //notificamos evento
+        this.triggerEvent('change-preset', number);
     }
 
     return ControlPanel;

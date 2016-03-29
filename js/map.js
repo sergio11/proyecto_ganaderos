@@ -198,10 +198,13 @@ var Map = (function (_super, w) {
             this._currentZone.setMap(null);
             this._currentZone.label.open(null);
         }
-
         zone.setMap(this._map);
         zone.label.open(this._map);
 
+        var bounds = new google.maps.LatLngBounds();
+        var path = zone.getPath().getArray();
+        for (i = 0, len = path.length; i < len; i++) bounds.extend(path[i]);
+        this._fitMap(bounds.getCenter());
         this._currentZone = zone;
     }
 
