@@ -6,6 +6,8 @@ var ControlPanel = (function (_super, w, $) {
         this._cameras = cameras;
         this._current = 1;
         this._$container = $("#container");
+        this._currentPreset = 4;
+        this._intervalPreset = 5625;
         this.events = {
             'rotate-camera': [],
             'camera-zoom': [],
@@ -64,7 +66,7 @@ var ControlPanel = (function (_super, w, $) {
                 }
                 self._current.setIsMove(true);
             } else {
-                console.log("La Cámara se está moviendo");
+                swal("La cámara se encuentra en movimiento");
             }
 
         }).on("mouseup click", "[data-control]", function (e) {
@@ -125,7 +127,7 @@ var ControlPanel = (function (_super, w, $) {
             self.triggerEvent('camera-zoom', parseInt(this.value));
         });
 
-        var self = this, currentPreset = 4, intervalPreset = 5625;
+        var self = this;
         $("#presets").on("click", "[data-preset]", function (e) {
             e.preventDefault();
             if (!self._current.isMove()) {
@@ -136,7 +138,7 @@ var ControlPanel = (function (_super, w, $) {
                     self.activePreset(preset);
                 }
             } else {
-                console.log("La cámara se está moviendo");
+                swal("La cámara se encuentra en movimiento");
             }
 
         });
@@ -168,6 +170,13 @@ var ControlPanel = (function (_super, w, $) {
 
         $("#presets").find("[data-preset]").removeClass("active").eq(number - 1).addClass("active");
         this._current.goPreset(number);
+        this._current.setIsMove(true);
+        setTimeout(function () {
+            console.log("Move Finished ...");
+            //save current preset
+            this._currentPreset = number;
+            this._current.setIsMove(false);
+        }.bind(this), Math.abs((this._currentPreset * this._intervalPreset) - (number * this._intervalPreset)));
         //notificamos evento
         this.triggerEvent('change-preset', number);
     }

@@ -137,7 +137,7 @@ var Map = (function (_super, w) {
             this.triggerEvent('change-zone', this._currentZone);
 
         } else {
-            console.log("La cámara se está moviendo !!!!");
+            swal("La cámara se encuentra en movimiento");
         }
 
     };
@@ -236,7 +236,9 @@ var Map = (function (_super, w) {
                     geodesic: true
                 }));
 
+
                 camera.setZones(camera.getZones().map(this._createZoneFor.bind(this)));
+
             } .bind(this))(this._cameras[i]);
 
         //Cargamos los objetivos
@@ -260,7 +262,34 @@ var Map = (function (_super, w) {
             } .bind(this))(this._cows[i]);
 
         //Establecemos la cámara por defecto
-        this.setCamera(this._cameras[1]);
+        this.setCamera(this._cameras[0]);
+
+        var points = this._cameras[0].getArea().getPath().getArray();
+        var distance = google.maps.geometry.spherical.computeDistanceBetween(points[1], points[points.length - 2]) / 7;
+        var heading = google.maps.geometry.spherical.computeHeading(points[1], points[points.length - 2]);
+
+        var lastPoint = points[1];
+        var map = this._map;
+        for (var i = 0; i < 7; i++) {
+            var newPoint = google.maps.geometry.spherical.computeOffset(lastPoint, distance, heading);
+            var heading2 = google.maps.geometry.spherical.computeHeading(points[0], lastPoint);
+            var heading3 = google.maps.geometry.spherical.computeHeading(points[0], newPoint);
+            var supPoint = google.maps.geometry.spherical.computeOffset(lastPoint, distance, heading2);
+            var supPoint2 = google.maps.geometry.spherical.computeOffset(newPoint, distance, heading3);
+            new google.maps.Marker({ position: newPoint, map: map, title: 'Punto ' + i });
+            var polygon = new google.maps.Polygon({
+                strokeColor: '#DAA520',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#DAA520',
+                fillOpacity: 0.2
+            });
+            polygon.setMap(map);
+            polygon.setPath([points[0], lastPoint, supPoint, supPoint2, newPoint, points[points.length - 1]]);
+            lastPoint = newPoint;
+        }
+
+
 
     };
 

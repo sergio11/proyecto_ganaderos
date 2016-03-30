@@ -2,6 +2,7 @@ html, body {
     height: 100%;
     margin: 0;
    	padding: 0;
+    overflow-y: hidden;
 }
 
 .hide{
@@ -26,12 +27,12 @@ html, body {
 }
 
 /* Overlay */
-.overlay, .overlay-body , .loader{
+.overlay-modal, .overlay-body , .loader{
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
 }
 
-.overlay{
+.overlay-modal{
     background-color: rgba(0,0,0,0.6);
     z-index: 999;
     opacity: 0;
@@ -41,13 +42,13 @@ html, body {
     transition: transform .5s , opacity .6s;
 }
 
-.overlay.active {
+.overlay-modal.active {
     -webkit-transform: translateY(0);
     transform: translateY(0);
     opacity: 1;
 }
 
-.overlay .overlay-close {
+.overlay-modal .overlay-close {
     position: absolute;
     top: 20px; right: 20px;
     color: #fff;
