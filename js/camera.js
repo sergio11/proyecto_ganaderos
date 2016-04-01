@@ -6,6 +6,7 @@ var Camera = (function (_super, w, $) {
 
     //Camera Constructor
     function Camera(options) {
+        this._id = options.id;
         this._title = options.title;
         this._url = options.url;
         this._latlngPlain = options.coords;
@@ -14,7 +15,6 @@ var Camera = (function (_super, w, $) {
         this._zones = options.zones;
         this._timer = null;
         this._content = null;
-        this._areaPolygon = null;
         this._marker = null;
         this.presets = [];
         this._isMove = false;
@@ -131,7 +131,6 @@ var Camera = (function (_super, w, $) {
                 clearInterval(moveTimer);
                 this.triggerEvent('scan-finished');
 
-
             } .bind(this), 45000);
 
         } .bind(this), 24000);
@@ -163,6 +162,10 @@ var Camera = (function (_super, w, $) {
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'stop' });
     };
 
+    Camera.prototype.hide = function () {
+        this._content.find("object").replaceWith($("<img>",{'src': './img/vaca.jpg'}));
+    }
+
     Camera.prototype.verticalScan = function () {
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'vscan' });
     };
@@ -175,34 +178,36 @@ var Camera = (function (_super, w, $) {
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'stop' });
     };
 
+    //
     Camera.prototype.goPreset = function (number) {
         this._cmdSubmit({ 'cmd': 'preset', 'act': 'goto', 'status': 1, 'number': number });
     }
 
-    Camera.prototype.showIn = function ($target) {
-        if (!this._content) {
-            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-                this._content = $("<img>", { 'width': 640, 'height': 480 });
-            } else {
-                if (w.confirm("¿Usar Componente VLC para visualizar Vídeo?")) {
-                    this._content = $("<object>", { 'id': 'player' }).append(
+    //640 x 480
+    Camera.prototype.showIn = function ($target, size, vlc, options) {
+        if (!vlc) {
+            this._content = $("<img>", { 'width': size.width, 'height': size.height });
+        } else {
+            this._content = $("<div>", { 'id': this._id, 'data-camera': true })
+                    .css({ 'width': size.width, 'height': size.height }).append(
+                    $("<object>").append(
                         $("<param>", { 'name': 'autostart', 'value': 'true' }),
-						$("<param>", { 'name': 'movie', 'value': this._url }),
-						$("<embed>", {
-						    'id': 'vlc',
-						    'type': 'application/x-vlc-plugin',
-						    'pluginspage': 'http://www.videolan.org',
-						    'name': 'video1',
-						    'loop': 'no',
-						    'width': 640,
-						    'height': 480,
-						    'target': this._url
-						})
-					)
-                } else {
-                    this._content = $("<img>", { 'width': 640, 'height': 480 });
-                }
-            }
+                        $("<param>", { 'name': 'movie', 'value': this._url }),
+                        $("<param>", { 'name': 'wmode', 'value': 'transparent' }),
+                        options.map(function (option) {
+                            return $("<param>", { 'name': option.name, 'value': option.value });
+                        }),
+				        $("<embed>", {
+				            'id': 'vlc' + this._id,
+				            'name': 'vlc_camera',
+				            'type': 'application/x-vlc-plugin',
+				            'pluginspage': 'http://www.videolan.org',
+				            'width': size.width,
+				            'height': size.height,
+				            'target': this._url
+				        })
+			    )
+            );
         }
         this._content.appendTo($target);
     };
@@ -216,15 +221,12 @@ var Camera = (function (_super, w, $) {
         this._marker && this._marker.setAnimation(null);
     };
 
-
     Camera.prototype.play = function () {
         if (this._content.get(0) instanceof HTMLImageElement) {
             //configuramos el timer.
             this._timer = setInterval(this._showNextImage.bind(this), 330);
         }
     };
-
-
 
     return Camera;
 

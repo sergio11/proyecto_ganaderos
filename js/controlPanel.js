@@ -4,10 +4,11 @@ var ControlPanel = (function (_super, w, $) {
 
     function ControlPanel(cameras) {
         this._cameras = cameras;
-        this._current = 1;
+        this._current = null;
         this._$container = $("#container");
         this._currentPreset = 4;
         this._intervalPreset = 5625;
+        this._usingVLC = false;
         this.events = {
             'rotate-camera': [],
             'camera-zoom': [],
@@ -18,6 +19,10 @@ var ControlPanel = (function (_super, w, $) {
 
     ControlPanel.prototype.init = function () {
 
+        if (navigator.userAgent.toLowerCase().indexOf('chrome') == -1 && w.confirm("¿Usar Componente VLC para visualizar los Vídeos?")) {
+            this._usingVLC = true;
+        }
+
         var $overlay = $("#overlay");
         $(".overlay-close", $overlay).on("click", function (e) {
             e.preventDefault();
@@ -26,10 +31,11 @@ var ControlPanel = (function (_super, w, $) {
 
         });
 
-        //Activamos por defecto la primera cámara
-        this._current = this._cameras[1];
-        this._current.showIn(this._$container);
-        //vlc.playlist.play();
+        //load cameras
+        this._loadCameras();
+
+
+
         //this._current._scanPreset();
         //Funcionalidad para los controles.
         var self = this, timer = null;
@@ -99,12 +105,12 @@ var ControlPanel = (function (_super, w, $) {
         //Reset Presets.
         $("#resetPresets").on("click", function (e) {
             e.preventDefault();
+            //hide cameras.
+            this._cameras.forEach(function (camera) {camera.hide()});
             console.log("Init Scan ...");
-            $("#player").fadeOut(1000, function () {
-                $overlay.addClass("active");
-                $("#presets").empty();
-                this._current.scanPreset();
-            } .bind(this));
+            $overlay.addClass("active");
+            $("#presets").empty();
+            this._current.scanPreset();
             //Scan Finished Handler
             this._current.addEventListener("scan-finished", function () {
                 this._createPresetsBar();
@@ -114,7 +120,6 @@ var ControlPanel = (function (_super, w, $) {
                 this.activePreset(preset);
                 this._current.setIsMove(true);
                 $overlay.removeClass("active");
-                $("#player").fadeIn(1000);
                 setTimeout(function () {
                     this._current.setIsMove(false);
                 } .bind(this), 45 / zones * preset * 1000);
@@ -143,6 +148,12 @@ var ControlPanel = (function (_super, w, $) {
 
         });
 
+        //change cámara
+        $("#others-cameras").on("click", "[data-camera]", function (e) {
+            e.preventDefault();
+            console.log("Id : ", this.id);
+        })
+
     };
 
     //create presets bar
@@ -160,9 +171,32 @@ var ControlPanel = (function (_super, w, $) {
         $("#presets").append($fragment);
     }
 
+    //load cameras.
+    ControlPanel.prototype._loadCameras = function () {
+        //Activamos por defecto la primera cámara
+        this._current = this._cameras[0];
+        this._current.showIn(this._$container, { width: 640, height: 480 }, this._usingVLC, [
+                { 'name': 'controls', 'value': 'true' },
+                { 'name': 'allowfullscreen', 'value': 'true' }
+        ]);
+
+        var $cameras = $("#others-cameras");
+        this._cameras.slice(1).forEach(function (camera) {
+            camera.showIn($cameras, { width: 200, height: 200 }, this._usingVLC, [
+                { 'name': 'controls', 'value': 'true' },
+                { 'name': 'allowfullscreen', 'value': 'true' }
+            ]);
+        } .bind(this));
+    }
+
     //Return current Camera.
     ControlPanel.prototype.getCurrentCamera = function () {
         return this._current;
+    }
+
+    //Set Current Camera
+    ControlPanel.prototype.setCurrentCamera = function (camera) {
+        this._current = camera;
     }
 
     //Active Preset
@@ -176,7 +210,7 @@ var ControlPanel = (function (_super, w, $) {
             //save current preset
             this._currentPreset = number;
             this._current.setIsMove(false);
-        }.bind(this), Math.abs((this._currentPreset * this._intervalPreset) - (number * this._intervalPreset)));
+        } .bind(this), Math.abs((this._currentPreset * this._intervalPreset) - (number * this._intervalPreset)));
         //notificamos evento
         this.triggerEvent('change-preset', number);
     }

@@ -34,7 +34,8 @@ var Map = (function (_super, w) {
         this.angle = 0;
         this.limit_exceeded;
         this.events = {
-            'change-zone': []
+            'change-zone': [],
+            'change-camera': []
         }
 
     }
@@ -112,29 +113,25 @@ var Map = (function (_super, w) {
     };
 
     Map.prototype._onClickCow = function (cow) {
-        console.log("isMove : " + this._currentCamera.isMove());
         if (!this._currentCamera.isMove()) {
-
             if (!google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), this._currentCamera.getArea())) {
                 this._cameras.forEach(function (camera) {
                     google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), camera.getArea()) && this.setCamera(camera);
                 } .bind(this));
             }
-
             //obtenemos zonas
             var zones = this._currentCamera.getZones();
             var zone = zones.find(function (zone) {
                 return google.maps.geometry.poly.containsLocation(cow.marker.getPosition(), zone);
             });
-
-            this.activeZone(zone);
+            //Notificamos cambio de zona.
+            this.triggerEvent('change-zone', zone);
 
             //this._setCurrentTarget(cow.marker.getPosition());
             this._attachInfoWindows(cow.marker, this._cows[cow.marker.idx].content);
             //Ajustamos el mapa.
             this._fitMap(cow.marker.getPosition());
-            //Notificamos cambio de zona.
-            this.triggerEvent('change-zone', this._currentZone);
+
 
         } else {
             swal("La cámara se encuentra en movimiento");
@@ -187,12 +184,13 @@ var Map = (function (_super, w) {
         this._map.setCenter(camera.getLatlng());
 
         this._currentCamera.getArea().setMap(this._map);
+        //change cámera
+        this.triggerEvent("change-camera", camera);
     }
 
     //Active Zone
     Map.prototype.activeZone = function (zone) {
-        console.log("Active Zone ");
-        console.log(zone);
+        console.log("Activando la zona : ", zone);
         //desactivamos zona actual.
         if (this._currentZone) {
             this._currentZone.setMap(null);
@@ -200,11 +198,11 @@ var Map = (function (_super, w) {
         }
         zone.setMap(this._map);
         zone.label.open(this._map);
-
         var bounds = new google.maps.LatLngBounds();
         var path = zone.getPath().getArray();
         for (i = 0, len = path.length; i < len; i++) bounds.extend(path[i]);
         this._fitMap(bounds.getCenter());
+
         this._currentZone = zone;
     }
 
@@ -233,9 +231,13 @@ var Map = (function (_super, w) {
                     fillColor: '#FF0000',
                     fillOpacity: 0.15,
                     draggable: false,
-                    geodesic: true
+                    geodesic: true,
+                    zIndex: 99
                 }));
 
+                /*google.maps.event.addListener(area, 'click', function (event) {
+                console.log("Lugar pulsado : ", event.latLng.toJSON());
+                });*/
 
                 camera.setZones(camera.getZones().map(this._createZoneFor.bind(this)));
 
@@ -264,32 +266,36 @@ var Map = (function (_super, w) {
         //Establecemos la cámara por defecto
         this.setCamera(this._cameras[0]);
 
-        var points = this._cameras[0].getArea().getPath().getArray();
+
+        //this._cameras[2].getZones().forEach(function (zone) { zone.setMap(this._map) }.bind(this));
+
+
+
+
+        /*var points = this._cameras[0].getArea().getPath().getArray();
         var distance = google.maps.geometry.spherical.computeDistanceBetween(points[1], points[points.length - 2]) / 7;
         var heading = google.maps.geometry.spherical.computeHeading(points[1], points[points.length - 2]);
 
         var lastPoint = points[1];
         var map = this._map;
         for (var i = 0; i < 7; i++) {
-            var newPoint = google.maps.geometry.spherical.computeOffset(lastPoint, distance, heading);
-            var heading2 = google.maps.geometry.spherical.computeHeading(points[0], lastPoint);
-            var heading3 = google.maps.geometry.spherical.computeHeading(points[0], newPoint);
-            var supPoint = google.maps.geometry.spherical.computeOffset(lastPoint, distance, heading2);
-            var supPoint2 = google.maps.geometry.spherical.computeOffset(newPoint, distance, heading3);
-            new google.maps.Marker({ position: newPoint, map: map, title: 'Punto ' + i });
-            var polygon = new google.maps.Polygon({
-                strokeColor: '#DAA520',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#DAA520',
-                fillOpacity: 0.2
-            });
-            polygon.setMap(map);
-            polygon.setPath([points[0], lastPoint, supPoint, supPoint2, newPoint, points[points.length - 1]]);
-            lastPoint = newPoint;
-        }
-
-
+        var newPoint = google.maps.geometry.spherical.computeOffset(lastPoint, distance, heading);
+        var heading2 = google.maps.geometry.spherical.computeHeading(points[0], lastPoint);
+        var heading3 = google.maps.geometry.spherical.computeHeading(points[0], newPoint);
+        var supPoint = google.maps.geometry.spherical.computeOffset(lastPoint, distance * 10, heading2);
+        var supPoint2 = google.maps.geometry.spherical.computeOffset(newPoint, distance * 10, heading3);
+        new google.maps.Marker({ position: newPoint, map: map, title: 'Punto ' + i });
+        var polygon = new google.maps.Polygon({
+        strokeColor: '#DAA520',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#DAA520',
+        fillOpacity: 0.2
+        });
+        polygon.setMap(map);
+        polygon.setPath([points[0], lastPoint, supPoint, supPoint2, newPoint, points[points.length - 1]]);
+        lastPoint = newPoint;
+        }*/
 
     };
 

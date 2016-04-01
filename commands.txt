@@ -1,8 +1,13 @@
 ffmpeg -s 640x480 -i rtsp://212.128.154.211:554/live/ch0 -b:a 800k -r 30 http://localhost/proyecto_ganaderos/stream/640/480
 
-ffmpeg -i rtsp://212.128.154.211:554/live/ch0  -s 640x480 -f image2 -b:a 800k -r 30 C:\xampp\htdocs\proyecto_ganaderos\stream\640x480\%04d.jpg
+-- FFMPEG
+ffmpeg -i rtsp://212.128.154.128:554/live/ch0  -s 640x480 -f image2 -b:a 800k -r 30 C:\xampp\htdocs\proyecto_ganaderos\stream\640x480\%04d.jpg
 
 ffmpeg -i rtsp://212.128.154.211:554/live/ch0 -s 640x480 -f mp4video -vf "crop=iw-mod(iw\,2):ih-mod(ih\,2)" -b:a 800k -r 30 C:\xampp\htdocs\proyecto_ganaderos\stream\640\480\out.mp4
+
+
+
+ffmpeg -y -i rtsp://212.128.154.128:554/live/ch0 -r 10 -f image2 C:\xampp\htdocs\proyecto_ganaderos\stream\camera.jpg
 
 --FFMPEG command to convert rtsp to mp4
 ffmpeg -i rtsp://212.128.154.211:554/live/ch0 -s 640x480 -vcodec copy -acodec copy -r 30 C:\xampp\htdocs\proyecto_ganaderos\stream\640\480\out.mp4
