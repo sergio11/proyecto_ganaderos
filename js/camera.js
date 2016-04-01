@@ -163,7 +163,7 @@ var Camera = (function (_super, w, $) {
     };
 
     Camera.prototype.hide = function () {
-        this._content.find("object").replaceWith($("<img>",{'src': './img/vaca.jpg'}));
+        this._content.find("object").replaceWith($("<img>", { 'src': './img/vaca.jpg' }));
     }
 
     Camera.prototype.verticalScan = function () {
@@ -211,6 +211,10 @@ var Camera = (function (_super, w, $) {
         }
         this._content.appendTo($target);
     };
+
+    Camera.prototype.showThumbnails = function () {
+        $.getJSON('./screenshot.php', { 'url': this._url }, function () { });
+    }
 
 
     Camera.prototype.animateMarker = function () {
