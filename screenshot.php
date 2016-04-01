@@ -4,7 +4,7 @@
     header('Content-Type: application/json');    
 
     $url = $_GET['url'];
-    $file = "./tmp/camera.jpg";
+    $file = "./tmp/camera_frame_".mt_rand(5, 15).".jpg";
     if (!filter_var($url, FILTER_VALIDATE_URL) === false) {
         $cmd = "ffmpeg -y -i $url -r 10 -f image2 $file";
         exec($cmd);
@@ -16,6 +16,7 @@
             //Convert Image To Data URI 
 	        $result = array("dataUri" =>'data:image/' . $type . ';base64,' . base64_encode($data));
         }
+        unlink($file);
         //Return JSON
 	    echo json_encode($result);
     }

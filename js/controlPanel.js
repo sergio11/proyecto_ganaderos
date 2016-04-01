@@ -34,8 +34,6 @@ var ControlPanel = (function (_super, w, $) {
         //load cameras
         this._loadCameras();
 
-
-
         //this._current._scanPreset();
         //Funcionalidad para los controles.
         var self = this, timer = null;
@@ -106,7 +104,7 @@ var ControlPanel = (function (_super, w, $) {
         $("#resetPresets").on("click", function (e) {
             e.preventDefault();
             //hide cameras.
-            this._cameras.forEach(function (camera) {camera.hide()});
+            this._cameras.forEach(function (camera) { camera.hide() });
             console.log("Init Scan ...");
             $overlay.addClass("active");
             $("#presets").empty();
@@ -151,7 +149,12 @@ var ControlPanel = (function (_super, w, $) {
         //change cámara
         $("#others-cameras").on("click", "[data-camera]", function (e) {
             e.preventDefault();
-            console.log("Id : ", this.id);
+            var id = this.id;
+            var camera = self._cameras.find(function (camera) {
+                return camera.id == id;
+            });
+            self.triggerEvent("change-camera", camera);
+            self.setCurrentCamera(camera);
         })
 
     };
@@ -181,11 +184,8 @@ var ControlPanel = (function (_super, w, $) {
         ]);
 
         var $cameras = $("#others-cameras");
-        this._cameras.slice(1).forEach(function (camera) {
-            camera.showIn($cameras, { width: 200, height: 200 }, this._usingVLC, [
-                { 'name': 'controls', 'value': 'true' },
-                { 'name': 'allowfullscreen', 'value': 'true' }
-            ]);
+        this._cameras.forEach(function (camera) {
+            camera.showThumbnailsIn($cameras);
         } .bind(this));
     }
 

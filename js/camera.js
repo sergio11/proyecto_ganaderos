@@ -188,32 +188,32 @@ var Camera = (function (_super, w, $) {
         if (!vlc) {
             this._content = $("<img>", { 'width': size.width, 'height': size.height });
         } else {
-            this._content = $("<div>", { 'id': this._id, 'data-camera': true })
-                    .css({ 'width': size.width, 'height': size.height }).append(
-                    $("<object>").append(
-                        $("<param>", { 'name': 'autostart', 'value': 'true' }),
-                        $("<param>", { 'name': 'movie', 'value': this._url }),
-                        $("<param>", { 'name': 'wmode', 'value': 'transparent' }),
-                        options.map(function (option) {
-                            return $("<param>", { 'name': option.name, 'value': option.value });
-                        }),
-				        $("<embed>", {
-				            'id': 'vlc' + this._id,
-				            'name': 'vlc_camera',
-				            'type': 'application/x-vlc-plugin',
-				            'pluginspage': 'http://www.videolan.org',
-				            'width': size.width,
-				            'height': size.height,
-				            'target': this._url
-				        })
-			    )
-            );
+            this._content = $("<object>").append(
+                                $("<param>", { 'name': 'autostart', 'value': 'true' }),
+                                $("<param>", { 'name': 'movie', 'value': this._url }),
+                                options.map(function (option) {
+                                    return $("<param>", { 'name': option.name, 'value': option.value });
+                                }),
+				                $("<embed>", {
+				                    'id': 'vlc' + this._id,
+				                    'name': 'vlc_camera',
+				                    'type': 'application/x-vlc-plugin',
+				                    'pluginspage': 'http://www.videolan.org',
+				                    'width': size.width,
+				                    'height': size.height,
+				                    'target': this._url
+				                })
+			                );
         }
         this._content.appendTo($target);
     };
 
-    Camera.prototype.showThumbnails = function () {
-        $.getJSON('./screenshot.php', { 'url': this._url }, function () { });
+    Camera.prototype.showThumbnailsIn = function ($target) {
+        $.getJSON('./screenshot.php', { 'url': this._url }, function (response) {
+            if (!response.error) {
+                $("<img>", { 'id': this._id, 'data-camera': true , 'src': response.dataUri, 'width': 150, 'height': 150 }).appendTo($target);
+            }
+        }.bind(this));
     }
 
 
