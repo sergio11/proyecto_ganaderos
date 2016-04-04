@@ -229,16 +229,47 @@ html, body {
 */
 
 .others-cameras {
+    width: 80%;
     padding: 1rem 0;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: left;
     align-items: center;
 }
 
-.others-cameras > *{
+.others-cameras > .camera-thumbnail{
     margin: 0 1rem;
+    text-align: center;
+    color: #DAA520;
+    position: relative;
+
 }
+
+.others-cameras > .camera-thumbnail img {
+    -webkit-transition:  all .5s;
+    transition: all .5s;
+    cursor: pointer;
+}
+
+
+.others-cameras > .camera-thumbnail img:hover {
+    outline: 2px solid #DAA520;
+}
+
+.others-cameras > .camera-thumbnail.active::before {
+    font-family: "FontAwesome";
+    content: '\f03d';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 150px;
+    line-height: 150px;
+    z-index: 99;
+    color: #fff;
+    background-color: rgba(218, 165, 32, 0.34);
+    text-align: center;
+    font-size: 4rem;
+}
+
 
 /*
 	Popup

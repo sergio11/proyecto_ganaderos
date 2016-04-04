@@ -8,7 +8,7 @@ var Camera = (function (_super, w, $) {
     function Camera(options) {
         this._id = options.id;
         this._title = options.title;
-        this._url = options.url;
+        this._ip = options.ip;
         this._latlngPlain = options.coords;
         this._latlng = new google.maps.LatLng(options.coords.lat, options.coords.lng);
         this._area = options.area;
@@ -23,6 +23,9 @@ var Camera = (function (_super, w, $) {
         }
     }
 
+    Camera.prototype.getId = function () {
+        return this._id;
+    }
 
     //Getters and Setters
     Camera.prototype.getTitle = function () {
@@ -79,7 +82,7 @@ var Camera = (function (_super, w, $) {
 
     //Send Command to Proxy
     Camera.prototype._cmdSubmit = function (params) {
-        $.get("./ptzCtrlProxy.php", params);
+        $.get("./ptzCtrlProxy.php",{'ip': this._ip, 'params': params});
     };
 
     Camera.prototype._showNextImage = function () {
@@ -188,34 +191,48 @@ var Camera = (function (_super, w, $) {
         if (!vlc) {
             this._content = $("<img>", { 'width': size.width, 'height': size.height });
         } else {
+            var $embed = $("<embed>", {
+                'id': 'vlc' + this._id,
+                'name': 'vlc_camera',
+                'type': 'application/x-vlc-plugin',
+                'pluginspage': 'http://www.videolan.org',
+                'width': size.width,
+                'height': size.height,
+                'target': 'rtsp://admin:123456@' + this._ip + ':554/live/ch0'
+            });
+
             this._content = $("<object>").append(
-                                $("<param>", { 'name': 'autostart', 'value': 'true' }),
-                                $("<param>", { 'name': 'movie', 'value': this._url }),
-                                options.map(function (option) {
-                                    return $("<param>", { 'name': option.name, 'value': option.value });
-                                }),
-				                $("<embed>", {
-				                    'id': 'vlc' + this._id,
-				                    'name': 'vlc_camera',
-				                    'type': 'application/x-vlc-plugin',
-				                    'pluginspage': 'http://www.videolan.org',
-				                    'width': size.width,
-				                    'height': size.height,
-				                    'target': this._url
-				                })
-			                );
+                $("<param>", { 'name': 'autostart', 'value': 'true' }),
+                $("<param>", { 'name': 'movie', 'value': 'rtsp://admin:123456@' + this._ip + ':554/live/ch0' }),
+                options.map(function (option) {
+                    return $("<param>", { 'name': option.name, 'value': option.value });
+                })).append($embed);
         }
+
         this._content.appendTo($target);
     };
 
     Camera.prototype.showThumbnailsIn = function ($target) {
-        $.getJSON('./screenshot.php', { 'url': this._url }, function (response) {
+        $.getJSON('./screenshot.php', { 'ip': this._ip }, function (response) {
             if (!response.error) {
-                $("<img>", { 'id': this._id, 'data-camera': true , 'src': response.dataUri, 'width': 150, 'height': 150 }).appendTo($target);
+                var $figure = $("<figure>", { 'data-id': this._id, 'data-camera': true, 'class': 'camera-thumbnail' })
+                    .append(
+                        $("<img>", { 'src': response.dataUri, 'width': 150, 'height': 150, 'title': this._title }),
+                        $("<figcaption>", { 'text': this._title })
+                    );
+                var thumbnails = $target.children("[data-id=" + this._id + "]");
+                if (thumbnails.length) {
+                    thumbnails.replaceWith($figure);
+                } else {
+                    $figure.appendTo($target);
+                }
             }
-        }.bind(this));
+        } .bind(this));
     }
-
+    //change camera aspect ratio
+    Camera.prototype.changeAspectRatio = function (aspectRatio) {
+        this._content.find("embed").get(0).video.aspectRatio = aspectRatio;
+    }
 
     Camera.prototype.animateMarker = function () {
         this._marker && this._marker.setAnimation(google.maps.Animation.BOUNCE);

@@ -1,13 +1,12 @@
 
 (function (w, $) {
 
-
     //Cameras.
     var cameras = [
         {
 		    'id': 1,
 		    'title': 'Cámara 1',
-		    'url': 'rtsp://212.128.154.128:554/live/ch0',
+		    'ip': '212.128.154.128',
 		    'coords': {
 		        'lat': 40.795728,
 		        'lng': -6.242950
@@ -170,7 +169,7 @@
 		{
 		    'id': 2,
 		    'title': 'Cámara 2',
-		    'url': 'rtsp://212.128.154.128:554/live/ch0',
+		    'ip': '212.128.157.227',
 		    'coords': {
 		        'lat': 40.796053,
 		        'lng': -6.242559
@@ -360,7 +359,7 @@
 		{
 		    'id': 3,
 		    'title': 'Cámara 3',
-		    'url': 'rtsp://212.128.154.128:554/live/ch0',
+		    'ip': '212.128.154.128',
 		    'coords': {
 		        'lat': 40.796114,
 		        'lng': -6.242665
@@ -601,13 +600,11 @@
 
             map.load();
             map.addEventListener('change-zone', function (zone) {
-                console.log("Change Zone To .... ");
-                console.log(zone);
                 controlPanel.activePreset(zone.idx);
             });
 
             map.addEventListener('change-camera', function (camera) {
-                console.log("Camera actual ", camera);
+                //change camera in control panel.
                 controlPanel.setCurrentCamera(camera);
             });
 
@@ -619,9 +616,9 @@
                 map.setZoom(zoom);
             });
 
-            controlPanel.addEventListener('change-camera', function (i) {
-                console.log("índice de la cámara actual : " + i);
-                map.setCamera(i);
+            controlPanel.addEventListener('change-camera', function (camera) {
+                //change camera in map
+                map.setCamera(camera);
             });
 
             controlPanel.addEventListener('change-preset', function (preset) {
@@ -638,11 +635,6 @@
 
             //Inicio panel de control.
             controlPanel.init();
-
-            var vlc_cameras = document.getElementsByName('vlc_camera');
-            for (var i = 0, len = vlc_cameras.length; i < len; i++) { 
-                vlc_cameras[i].video.aspectRatio = "4:3";
-            }
 
         });
     }

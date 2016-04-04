@@ -6,10 +6,13 @@
 	*   where cmd can be 'up','down','left','right','stop'
 	*/
 
-	if(isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])){
-		$username='admin';
-		$password='123456';
-		$URL="http://212.128.154.128/hy-cgi/ptz.cgi?".$_SERVER['QUERY_STRING'];
+
+    
+    if((isset($_GET['ip']) && !empty($_GET['ip'])) && (isset($_GET['params']) && !empty($_GET['params'])) ){
+        $ip = $_GET['ip'];
+        $params = $_GET['params'];
+        //url
+		$URL="http://$ip/hy-cgi/ptz.cgi?".http_build_query($params);
 		$handler = fopen('./proxy-error.log','w');
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $URL);
@@ -23,12 +26,10 @@
  		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
  		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)"); 
 		$result = curl_exec($ch);
+        print_r($result);
 		curl_close($ch);
 
-	}
 
-    
-  	
-	
+    }
 
 ?>

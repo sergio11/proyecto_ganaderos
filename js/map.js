@@ -182,7 +182,6 @@ var Map = (function (_super, w) {
         });
         this._currentCamera.animateMarker();
         this._map.setCenter(camera.getLatlng());
-
         this._currentCamera.getArea().setMap(this._map);
         //change cámera
         this.triggerEvent("change-camera", camera);

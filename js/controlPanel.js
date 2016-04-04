@@ -149,13 +149,18 @@ var ControlPanel = (function (_super, w, $) {
         //change cámara
         $("#others-cameras").on("click", "[data-camera]", function (e) {
             e.preventDefault();
-            var id = this.id;
-            var camera = self._cameras.find(function (camera) {
-                return camera.id == id;
-            });
-            self.triggerEvent("change-camera", camera);
-            self.setCurrentCamera(camera);
-        })
+            var $this = $(this);
+            if (!$this.hasClass('active')) {
+                $this.addClass('active').siblings().removeClass('active');
+                var id = this.dataset.id;
+                var camera = self._cameras.find(function (camera) {
+                    return camera.getId() == id;
+                });
+                this._current = camera;
+                //notificamos cambio de cámara.
+                self.triggerEvent("change-camera", camera);
+            }
+        });
 
     };
 
@@ -177,11 +182,12 @@ var ControlPanel = (function (_super, w, $) {
     //load cameras.
     ControlPanel.prototype._loadCameras = function () {
         //Activamos por defecto la primera cámara
-        this._current = this._cameras[0];
+        this._current = this._cameras[1];
         this._current.showIn(this._$container, { width: 640, height: 480 }, this._usingVLC, [
                 { 'name': 'controls', 'value': 'true' },
                 { 'name': 'allowfullscreen', 'value': 'true' }
         ]);
+        this._current.changeAspectRatio("4:3");
 
         var $cameras = $("#others-cameras");
         this._cameras.forEach(function (camera) {
@@ -197,6 +203,12 @@ var ControlPanel = (function (_super, w, $) {
     //Set Current Camera
     ControlPanel.prototype.setCurrentCamera = function (camera) {
         this._current = camera;
+        this._$container.empty();
+        this._current.showIn(this._$container, { width: 640, height: 480 }, this._usingVLC, [
+                { 'name': 'controls', 'value': 'true' },
+                { 'name': 'allowfullscreen', 'value': 'true' }
+        ]);
+        this._current.changeAspectRatio("4:3");
     }
 
     //Active Preset
