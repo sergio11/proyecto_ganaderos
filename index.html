@@ -16,8 +16,14 @@
 		<div class="control-panel">
 			<div class="control-panel-content">
 				<div class="current">
-					<div id='container'></div>
-					
+					<div id='container'>
+                        <object>
+                            <param name='autostart' value='true'></param>
+                            <param name='controls' value='true'></param>
+                            <param name="allowfullscreen" value='true' ></param>
+                            <embed id='vlc' name='vlc_camera' type='application/x-vlc-plugin' pluginspage='http://www.videolan.org' width='640' height='480'></embed>
+                        </object>
+                    </div>
 					<div class="controls">
 						<div class="direction-controls">
 							<!-- Main Controls -->

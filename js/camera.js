@@ -13,13 +13,15 @@ var Camera = (function (_super, w, $) {
         this._latlng = new google.maps.LatLng(options.coords.lat, options.coords.lng);
         this._area = options.area;
         this._zones = options.zones;
-        this._timer = null;
-        this._content = null;
+        this._currentZone = null;
         this._marker = null;
         this.presets = [];
+        this._currentPreset = 4;
         this._isMove = false;
+        this._currentSecond = 0;
         this.events = {
-            'scan-finished': []
+            'scan-finished': [],
+            'change-preset': []
         }
     }
 
@@ -60,6 +62,12 @@ var Camera = (function (_super, w, $) {
         return this._zones;
     }
 
+    Camera.prototype.getZoneByIdx = function (idx) {
+        return this._zones.find(function (zone) {
+            return zone.idx == parseInt(idx);
+        });
+    }
+
     Camera.prototype.getCountZones = function () {
         return this._zones.length;
     }
@@ -72,6 +80,10 @@ var Camera = (function (_super, w, $) {
         return this.presets;
     }
 
+    Camera.prototype.hasPresets = function () {
+        return this.presets.length;
+    }
+
     Camera.prototype.setIsMove = function (val) {
         this._isMove = val;
     }
@@ -80,19 +92,47 @@ var Camera = (function (_super, w, $) {
         return this._isMove;
     }
 
+    Camera.prototype.getCurrentZone = function () {
+        return this._currentZone;
+    }
+
+    Camera.prototype.setCurrentZone = function (zone) {
+        this._currentZone = zone;
+    }
+
+    Camera.prototype.getCurrentPreset = function () {
+        return this._currentPreset;
+    }
+
+    Camera.prototype.setCurrentPreset = function (preset) {
+        this._currentPreset = preset;
+    }
+
+    Camera.prototype.getHomePreset = function () {
+        return Math.round(this._zones.length / 2);
+    }
+
+    Camera.prototype.setCurrentSecond = function (second) {
+        this._currentSecond = second;
+    }
+
+    Camera.prototype.getCurrentSecond = function () {
+        return this._currentSecond;
+    }
+
+    Camera.prototype.increaseSeconds = function () {
+        return ++this._currentSecond;
+    }
+
+    Camera.prototype.decrementingSeconds = function () {
+        return --this._currentSecond;
+    }
+
     //Send Command to Proxy
     Camera.prototype._cmdSubmit = function (params) {
-        $.get("./ptzCtrlProxy.php",{'ip': this._ip, 'params': params});
+        $.get("./ptzCtrlProxy.php", { 'ip': this._ip, 'params': params });
     };
 
-    Camera.prototype._showNextImage = function () {
-        $.getJSON("./stream_2.php").done(function (image) {
-            this._content.attr('src', image.dataUri)
-        } .bind(this)).fail(function (err) {
-            console.log("Fallo al obtener la imagen");
-            console.log(err);
-        });
-    };
 
     Camera.prototype._setPresets = function () {
         var count = this.presets.length + 1;
@@ -181,57 +221,59 @@ var Camera = (function (_super, w, $) {
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'stop' });
     };
 
-    //
+    //Go to preset
     Camera.prototype.goPreset = function (number) {
         this._cmdSubmit({ 'cmd': 'preset', 'act': 'goto', 'status': 1, 'number': number });
     }
 
-    //640 x 480
-    Camera.prototype.showIn = function ($target, size, vlc, options) {
-        if (!vlc) {
-            this._content = $("<img>", { 'width': size.width, 'height': size.height });
-        } else {
-            var $embed = $("<embed>", {
-                'id': 'vlc' + this._id,
-                'name': 'vlc_camera',
-                'type': 'application/x-vlc-plugin',
-                'pluginspage': 'http://www.videolan.org',
-                'width': size.width,
-                'height': size.height,
-                'target': 'rtsp://admin:123456@' + this._ip + ':554/live/ch0'
-            });
-
-            this._content = $("<object>").append(
-                $("<param>", { 'name': 'autostart', 'value': 'true' }),
-                $("<param>", { 'name': 'movie', 'value': 'rtsp://admin:123456@' + this._ip + ':554/live/ch0' }),
-                options.map(function (option) {
-                    return $("<param>", { 'name': option.name, 'value': option.value });
-                })).append($embed);
-        }
-
-        this._content.appendTo($target);
-    };
-
-    Camera.prototype.showThumbnailsIn = function ($target) {
-        $.getJSON('./screenshot.php', { 'ip': this._ip }, function (response) {
-            if (!response.error) {
-                var $figure = $("<figure>", { 'data-id': this._id, 'data-camera': true, 'class': 'camera-thumbnail' })
-                    .append(
-                        $("<img>", { 'src': response.dataUri, 'width': 150, 'height': 150, 'title': this._title }),
-                        $("<figcaption>", { 'text': this._title })
-                    );
-                var thumbnails = $target.children("[data-id=" + this._id + "]");
-                if (thumbnails.length) {
-                    thumbnails.replaceWith($figure);
-                } else {
-                    $figure.appendTo($target);
-                }
-            }
-        } .bind(this));
+    Camera.prototype.goToHome = function () {
+        var preset = Math.round(this._zones.length / 2);
+        this._cmdSubmit({ 'cmd': 'preset', 'act': 'goto', 'status': 1, 'number': preset });
+        return preset;
     }
-    //change camera aspect ratio
-    Camera.prototype.changeAspectRatio = function (aspectRatio) {
-        this._content.find("embed").get(0).video.aspectRatio = aspectRatio;
+
+    Camera.prototype.getRtspURL = function () {
+        return 'rtsp://admin:123456@' + this._ip + ':554/live/ch0';
+    }
+
+    //640 x 480
+    /*Camera.prototype.showIn = function ($target, size, vlc, options) {
+    if (!vlc) {
+    this._content = $("<img>", { 'width': size.width, 'height': size.height });
+    } else {
+    var $embed = $("<embed>", {
+    'id': 'vlc' + this._id,
+    'name': 'vlc_camera',
+    'type': 'application/x-vlc-plugin',
+    'pluginspage': 'http://www.videolan.org',
+    'width': size.width,
+    'height': size.height,
+    'target': 
+    });
+
+    this._content = $("<object>").append(
+    $("<param>", { 'name': 'autostart', 'value': 'true' }),
+    $("<param>", { 'name': 'movie', 'value': 'rtsp://admin:123456@' + this._ip + ':554/live/ch0' }),
+    options.map(function (option) {
+    return $("<param>", { 'name': option.name, 'value': option.value });
+    })).append($embed);
+    }
+
+    this._content.appendTo($target);
+    };*/
+
+    Camera.prototype.showSyncScreenShot = function ($target) {
+        return $.getJSON('./screenshot.php', { 'ip': this._ip }).pipe(function (response) {
+            $("<figure>", { 'data-id': this._id, 'data-camera': true, 'class': 'camera-screenshot sync' })
+                    .append(
+                        $("<img>", { 'src': response.dataUri, 'width': 640, 'height': 480, 'title': this._title }),
+                        $("<figcaption>", { 'text': this._title })
+                    ).appendTo($target.empty());
+        });
+    }
+
+    Camera.prototype.takeSnapshot = function () {
+        return $.getJSON('./screenshot.php', { 'ip': this._ip });
     }
 
     Camera.prototype.animateMarker = function () {
@@ -242,12 +284,6 @@ var Camera = (function (_super, w, $) {
         this._marker && this._marker.setAnimation(null);
     };
 
-    Camera.prototype.play = function () {
-        if (this._content.get(0) instanceof HTMLImageElement) {
-            //configuramos el timer.
-            this._timer = setInterval(this._showNextImage.bind(this), 330);
-        }
-    };
 
     return Camera;
 

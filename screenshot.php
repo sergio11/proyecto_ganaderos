@@ -9,12 +9,14 @@
     $type = pathinfo($file, PATHINFO_EXTENSION);
     $data = file_get_contents($file);
     if(!$data){
-        $result = array("error" => true);
+        $data = file_get_contents('./img/no-video.png');
+        $result = array("dataUri" =>'data:image/png;base64,' . base64_encode($data));
     }else{
         //Convert Image To Data URI 
 	    $result = array("dataUri" =>'data:image/' . $type . ';base64,' . base64_encode($data));
+        @unlink($file);
     }
-    unlink($file);
+    
     //Return JSON
 	echo json_encode($result);
 

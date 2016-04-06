@@ -36,6 +36,7 @@ html, body {
     background-color: rgba(0,0,0,0.6);
     z-index: 999;
     opacity: 0;
+    visibility: hidden;
     -webkit-transform: translateY(100%);
     transform: translateY(100%);
     -webkit-transition: -webkit-transform .5s , opacity .6s;
@@ -43,6 +44,7 @@ html, body {
 }
 
 .overlay-modal.active {
+    visibility: visible;
     -webkit-transform: translateY(0);
     transform: translateY(0);
     opacity: 1;
@@ -237,37 +239,49 @@ html, body {
     align-items: center;
 }
 
-.others-cameras > .camera-thumbnail{
+.camera-screenshot{
     margin: 0 1rem;
     text-align: center;
     color: #DAA520;
+    display: inline-block;
     position: relative;
 
 }
 
-.others-cameras > .camera-thumbnail img {
+.camera-screenshot img {
     -webkit-transition:  all .5s;
     transition: all .5s;
     cursor: pointer;
 }
 
 
-.others-cameras > .camera-thumbnail img:hover {
+.camera-screenshot img:hover {
     outline: 2px solid #DAA520;
 }
 
-.others-cameras > .camera-thumbnail.active::before {
+.camera-screenshot::before {
     font-family: "FontAwesome";
-    content: '\f03d';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 150px;
-    line-height: 150px;
     z-index: 99;
     color: #fff;
     background-color: rgba(218, 165, 32, 0.34);
     text-align: center;
     font-size: 4rem;
+}
+
+/* Camera Play */
+.camera-screenshot.play::before {
+    content: '\f03d';
+    height: 150px;
+    line-height: 150px;
+}
+
+/* Camera sync */
+.camera-screenshot.sync::before {
+    content: '\f021';
+    height: 480px;
+    line-height: 480px;
 }
 
 

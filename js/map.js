@@ -12,7 +12,6 @@ var Map = (function (_super, w) {
         this._cameras = cameras;
         this._cows = cows;
         this._currentCamera = null;
-        this._currentZone = null;
         //Intanciamos mapa
         this._map = new google.maps.Map(document.getElementById('map'), {
             center: new google.maps.LatLng(default_center.lat, default_center.lng),
@@ -109,7 +108,11 @@ var Map = (function (_super, w) {
 
     //Manejador evento click sobre marker tipo cámara.
     Map.prototype._onClickCamera = function (camera) {
-        this.setCamera(camera);
+        if (!this._currentCamera || !this._currentCamera.isMove()) {
+            this.setCamera(camera);
+        } else {
+            swal("La cámara se encuentra en movimiento");
+        }
     };
 
     Map.prototype._onClickCow = function (cow) {
@@ -131,8 +134,6 @@ var Map = (function (_super, w) {
             this._attachInfoWindows(cow.marker, this._cows[cow.marker.idx].content);
             //Ajustamos el mapa.
             this._fitMap(cow.marker.getPosition());
-
-
         } else {
             swal("La cámara se encuentra en movimiento");
         }
@@ -172,28 +173,46 @@ var Map = (function (_super, w) {
         this._infowindow.close();
         //ocultamos polígono proyección
         //this._polygon.setMap(null);
-        //Ocultamos la area activa.
-        this._currentCamera && this._currentCamera.getArea().setMap(null);
-        this._currentZone && this._currentZone.setMap(null)
-        //guardamos referencia a la nueva cámara activa
-        this._currentCamera = camera;
         this._cameras.forEach(function (camera) {
             camera.stopAnimateMarker();
         });
-        this._currentCamera.animateMarker();
+        //Ocultamos la area activa.
+        if (this._currentCamera) {
+            this._currentCamera.getArea().setMap(null);
+            var currentZone = this._currentCamera.getCurrentZone();
+            if (currentZone) {
+                currentZone.setMap(null);
+                currentZone.label.open(null);
+            }
+        }
+
+        camera.animateMarker();
         this._map.setCenter(camera.getLatlng());
-        this._currentCamera.getArea().setMap(this._map);
+        camera.getArea().setMap(this._map);
+
+        var currentZone = camera.getCurrentZone();
+        if (!currentZone) {
+            var countZones = camera.getCountZones();
+            var zones = camera.getZones();
+            currentZone = zones[Math.round(countZones / 2 - 1)];
+            camera.setCurrentZone(currentZone);
+        }
+
+        currentZone.setMap(this._map);
+        currentZone.label.open(this._map);
+        //guardamos referencia a la nueva cámara activa
+        this._currentCamera = camera;
         //change cámera
         this.triggerEvent("change-camera", camera);
     }
 
     //Active Zone
     Map.prototype.activeZone = function (zone) {
-        console.log("Activando la zona : ", zone);
         //desactivamos zona actual.
-        if (this._currentZone) {
-            this._currentZone.setMap(null);
-            this._currentZone.label.open(null);
+        var currentZone = this._currentCamera.getCurrentZone();
+        if (currentZone) {
+            currentZone.setMap(null);
+            currentZone.label.open(null);
         }
         zone.setMap(this._map);
         zone.label.open(this._map);
@@ -202,7 +221,7 @@ var Map = (function (_super, w) {
         for (i = 0, len = path.length; i < len; i++) bounds.extend(path[i]);
         this._fitMap(bounds.getCenter());
 
-        this._currentZone = zone;
+        this._currentCamera.setCurrentZone(zone);
     }
 
     Map.prototype.load = function () {
@@ -313,9 +332,6 @@ var Map = (function (_super, w) {
         } else {
         this.limit_exceeded = direction;
         }*/
-
-
-
     };
 
 
