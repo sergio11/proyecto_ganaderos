@@ -43,12 +43,15 @@ var ControlPanel = (function (_super, w, $) {
 
             var $figure = $("<figure>", { 'data-id': camera.getId(), 'data-camera': true, 'class': 'camera-screenshot' })
                 .append(
-                    $("<img>", { 'src': './img/loader.gif', 'width': 150, 'height': 150, 'title': camera.getTitle() }),
+                    $("<img>", { 'src': './img/loader.gif', 'width': 170, 'height': 170, 'title': camera.getTitle() }),
                     $("<figcaption>", { 'text': camera.getTitle() })
                 ).appendTo(this._$othersCameras);
 
             camera.takeSnapshot().done(function (response) {
                 $("img", $figure).attr('src', response.dataUri);
+            }).fail(function () {
+                console.log("Fail ........");
+                $("img", $figure).attr('src', './img/no-video.png');
             });
 
             camera.addEventListener('change-preset', this.activePreset);
@@ -89,6 +92,7 @@ var ControlPanel = (function (_super, w, $) {
                                 if (seconds < Math.round((preset - 1) * self._intervalPreset / 1000)) {
                                     var currentPreset = parseInt(preset) - 1;
                                     self._current.setCurrentPreset(currentPreset);
+                                    $("#presets").children().removeClass("active").eq(currentPreset - 1).addClass("active");
                                     self.triggerEvent('change-preset', currentPreset);
                                 }
                             } else {
@@ -97,6 +101,7 @@ var ControlPanel = (function (_super, w, $) {
                                 if (seconds > Math.round(preset * self._intervalPreset / 1000)) {
                                     var currentPreset = parseInt(preset) + 1;
                                     self._current.setCurrentPreset(currentPreset);
+                                    $("#presets").children().removeClass("active").eq(currentPreset - 1).addClass("active");
                                     self.triggerEvent('change-preset', currentPreset);
                                 }
                             }
@@ -151,28 +156,31 @@ var ControlPanel = (function (_super, w, $) {
         $("#resetPresets").on("click", function (e) {
             e.preventDefault();
             console.log("Init Scan ...");
-            var objectVLC = this._$container.children();
-            this._current.showSyncScreenShot(this._$container).done(function () {
-                $overlay.addClass("active");
-                $("#presets").empty();
-                this._current.scanPreset();
-                //Scan Finished Handler
-                this._current.addEventListener("scan-finished", function () {
-                    this._createPresetsBar();
-                    var preset = this._current.getHomePreset();
-                    //active preset.
-                    this.activePreset(preset);
-                    this._current.setIsMove(true);
-                    $overlay.removeClass("active");
-                    setTimeout(function () {
-                        console.log("Move finished chat ....");
-                        this._current.setIsMove(false);
-                    } .bind(this), 45 / this._current.getCountZones() * preset * 1000);
-                    this._$container.empty().append(objectVLC);
-                } .bind(this), true);
+            if (!this._current.isMove()) {
+                var objectVLC = this._$container.children();
+                this._current.showSyncScreenShot(this._$container).done(function () {
+                    $overlay.addClass("active");
+                    //desactivamos preset.
+                    $("#presets").children().removeClass("active");
+                    this._current.scanPreset();
+                    //Scan Finished Handler
+                    this._current.addEventListener("scan-finished", function () {
+                        var preset = this._current.getHomePreset();
+                        //active preset.
+                        this.activePreset(preset);
+                        this._current.setIsMove(true);
+                        $overlay.removeClass("active");
+                        setTimeout(function () {
+                            console.log("Move finished chat ....");
+                            this._current.setIsMove(false);
+                        } .bind(this), 45 / this._current.getCountZones() * preset * 1000);
+                        this._$container.empty().append(objectVLC);
+                    } .bind(this), true);
 
-            } .bind(this));
-
+                } .bind(this));
+            } else {
+                swal("La cámara se encuentra en movimiento");
+            }
         } .bind(this));
 
         //Zoom Control
@@ -185,7 +193,8 @@ var ControlPanel = (function (_super, w, $) {
             e.preventDefault();
             if (!self._current.isMove()) {
                 var preset = this.dataset.preset;
-                var $this = $(this);
+                console.log("Preset ...", preset);
+                var $this = $(this).parent();
                 if (!$this.hasClass("active")) {
                     $this.addClass("active");
                     self.activePreset(preset);
@@ -193,7 +202,6 @@ var ControlPanel = (function (_super, w, $) {
             } else {
                 swal("La cámara se encuentra en movimiento");
             }
-
         });
 
         //change cámara
@@ -211,24 +219,7 @@ var ControlPanel = (function (_super, w, $) {
                 self.triggerEvent("change-camera", camera);
             }
         });
-
     };
-
-    //create presets bar
-    ControlPanel.prototype._createPresetsBar = function () {
-        var presets = this._current.getPresets();
-        var $fragment = $(document.createDocumentFragment());
-        for (var i = 0; i < presets.length; i++) {
-            $fragment.append(
-                $("<li>", { 'class': 'preset' }).append(
-                    $("<a>", { 'text': presets[i].id, 'href': '#', 'data-preset': presets[i].id })
-                )
-            );
-        }
-        var zone = this._current.getCurrentZone();
-        zone && $fragment.children().eq(zone.idx).addClass("active");
-        $("#presets").empty().append($fragment);
-    }
 
     //Return current Camera.
     ControlPanel.prototype.getCurrentCamera = function () {
@@ -253,8 +244,9 @@ var ControlPanel = (function (_super, w, $) {
             this._vlc.setAttribute('src', url);
             this._vlc.video.aspectRatio = "4:3";
         }
-        //Create Presets bar for camera.
-        this._createPresetsBar();
+        var zone = this._current.getCurrentZone();
+        console.log("Esta es la zona : ", zone.idx);
+        zone && $("#presets").children().removeClass("active").eq(zone.idx - 1).addClass("active");
         //update thumbnails.
         this._$othersCameras.find("[data-id=" + camera.getId() + "]").addClass("play").siblings().removeClass("play");
 
@@ -273,7 +265,7 @@ var ControlPanel = (function (_super, w, $) {
             this._current.setCurrentPreset(number);
             this._current.setIsMove(false);
         } .bind(this), Math.abs((this._current.getCurrentPreset() * this._intervalPreset) - (number * this._intervalPreset)));
-        $("#presets").find("[data-preset]").removeClass("active").eq(number - 1).addClass("active");
+        $("#presets").children().removeClass("active").eq(number - 1).addClass("active");
         //notificamos evento
         this.triggerEvent('change-preset', number);
     }

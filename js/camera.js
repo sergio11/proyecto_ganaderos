@@ -15,7 +15,6 @@ var Camera = (function (_super, w, $) {
         this._zones = options.zones;
         this._currentZone = null;
         this._marker = null;
-        this.presets = [];
         this._currentPreset = 4;
         this._isMove = false;
         this._currentSecond = 0;
@@ -76,14 +75,6 @@ var Camera = (function (_super, w, $) {
         this._zones = zones;
     }
 
-    Camera.prototype.getPresets = function () {
-        return this.presets;
-    }
-
-    Camera.prototype.hasPresets = function () {
-        return this.presets.length;
-    }
-
     Camera.prototype.setIsMove = function (val) {
         this._isMove = val;
     }
@@ -130,37 +121,36 @@ var Camera = (function (_super, w, $) {
 
     //Send Command to Proxy
     Camera.prototype._cmdSubmit = function (params) {
-        $.get("./ptzCtrlProxy.php", { 'ip': this._ip, 'params': params });
+        $.get("./ptzCtrlProxy.php", { 'ip': this._ip, 'params': params }).fail(function () { 
+            swal("La acción no se ha podido realizar");
+        })
     };
 
 
-    Camera.prototype._setPresets = function () {
-        var count = this.presets.length + 1;
-        console.log("Estableciendo Presets número " + count);
-        this.presets.push({ 'name': 'Preset Número ' + count, 'id': count });
+    Camera.prototype._setPresets = function (number) {
+        console.log("Estableciendo Preset : ", number);
         ///hy-cgi/ptz.cgi?cmd=preset&act=set&status=1&number="+num+"'");
-        this._cmdSubmit({ 'cmd': 'preset', 'act': 'set', 'status': 1, 'number': count });
+        this._cmdSubmit({ 'cmd': 'preset', 'act': 'set', 'status': 1, 'number': number });
     }
 
 
     Camera.prototype.scanPreset = function () {
-        this.presets = [];
         console.log("Move to left");
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'left' });
         setTimeout(function () {
             console.log("Init Scan");
             //Init Set Presets
-            console.log("Estas son las zones");
-            console.log(this._zones.length);
-
             var setPresetsTimer = null;
             var interval = Math.floor(totalTime / this._zones.length * 1000);
             var delay = interval / 2;
             console.log("Interval : " + interval);
             console.log("Delay : " + delay);
             setTimeout(function () {
-                this._setPresets();
-                setPresetsTimer = setInterval(this._setPresets.bind(this), interval);
+                var number = 1;
+                this._setPresets(number);
+                setPresetsTimer = setInterval(function () {
+                    this._setPresets(++number);
+                } .bind(this), interval);
             } .bind(this), delay);
 
             var moveTimer = setInterval(function () {
@@ -173,10 +163,9 @@ var Camera = (function (_super, w, $) {
                 clearInterval(setPresetsTimer);
                 clearInterval(moveTimer);
                 this.triggerEvent('scan-finished');
-
             } .bind(this), 45000);
 
-        } .bind(this), 24000);
+        } .bind(this), 45000);
     }
 
 
@@ -204,10 +193,6 @@ var Camera = (function (_super, w, $) {
     Camera.prototype.stop = function () {
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'stop' });
     };
-
-    Camera.prototype.hide = function () {
-        this._content.find("object").replaceWith($("<img>", { 'src': './img/vaca.jpg' }));
-    }
 
     Camera.prototype.verticalScan = function () {
         this._cmdSubmit({ 'cmd': 'ptzctrl', 'act': 'vscan' });

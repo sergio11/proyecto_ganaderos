@@ -78,18 +78,27 @@ html, body {
 
 
 .wrapper{
-	width: 90%;
-	height: 95vh;
-	margin: 2rem auto 0 auto;
+    min-width: 1452px;
+	height: 100vh;
+    overflow: auto;
+    padding: 2rem 2.5rem 0 2.5rem;
 	letter-spacing: -.25rem;
+    text-align: center;
 }
 
 .wrapper > *{
 	display: inline-block;
 	vertical-align: top;
-	height: 100%;
 	width: 50%;
 	letter-spacing: normal;
+}
+
+.wrapper .control-panel {
+    height: 100%;
+}
+
+.wrapper .map {
+    height: 95%;
 }
 
 .wrapper .control-panel .control-panel-content{
@@ -220,8 +229,8 @@ html, body {
 	cursor: pointer;
 }
 
-.controls .presets > .preset a:hover,
-.controls .presets > .preset a.active {
+.controls .presets > .preset:hover a,
+.controls .presets > .preset.active a {
 	background-color: #C5951C;
 }
 
@@ -231,11 +240,10 @@ html, body {
 */
 
 .others-cameras {
-    width: 80%;
     padding: 1rem 0;
     display: flex;
     flex-direction: row;
-    justify-content: left;
+    justify-content: center;
     align-items: center;
 }
 
@@ -273,8 +281,8 @@ html, body {
 /* Camera Play */
 .camera-screenshot.play::before {
     content: '\f03d';
-    height: 150px;
-    line-height: 150px;
+    height: 170px;
+    line-height: 170px;
 }
 
 /* Camera sync */

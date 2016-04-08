@@ -6,6 +6,15 @@
 	*   where cmd can be 'up','down','left','right','stop'
 	*/
 
+    function error($numero,$texto){
+        $ddf = fopen('./errors-php.log','a');
+        fwrite($ddf,"[".date("r")."] Error $numero:$texto");
+        fclose($ddf);
+        /* No ejecutar el gestor de errores interno de PHP */
+         return true;
+    }
+
+    set_error_handler('error');
 
     
     if((isset($_GET['ip']) && !empty($_GET['ip'])) && (isset($_GET['params']) && !empty($_GET['params'])) ){
